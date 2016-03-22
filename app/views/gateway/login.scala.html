@@ -1,0 +1,25 @@
+@import play.api.data.Form
+@import controllers.gateway.UserData
+@import controllers.gateway.routes.GatewayLoginController
+
+@(form: Form[UserData])
+
+@main("Login in to Government Gateway") {
+    <div>
+        <h1>Login to Government Gateway</h1>
+        <form method="post" action="@GatewayLoginController.handleLogin()">
+            <div id="errors">
+            @form.errors.map { e => <div>@e.messages.head</div> }
+            </div>
+            <div>
+                <label for="username">User name:</label>
+                <input type="text" id="username" name="username" value="@form.value.getOrElse("")"/>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password"/>
+            </div>
+            <div><input type="submit" value="Login"/> </div>
+        </form>
+    </div>
+}

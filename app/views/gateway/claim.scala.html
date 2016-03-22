@@ -1,0 +1,10 @@
+@import db.gateway.GatewayUserRow
+@(empref: String, clientId: String, redirectUri: String)
+
+@main(s"Claiming empref $empref") {
+    <div>
+        <h3>User would like to claim EmpRef @empref</h3>
+        <a href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri)">Confirm</a>
+        <a href="">Deny</a>
+    </div>
+}
