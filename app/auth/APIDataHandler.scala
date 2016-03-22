@@ -17,6 +17,12 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
 
+case class Token(value: String, scope: String, expiresAt: Date)
+
+object Token {
+  implicit val formats = Json.format[Token]
+}
+
 @Singleton
 class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO, gatewayUsers: GatewayUserDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayUserRow] {
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
@@ -48,19 +54,18 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
     } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, createdAt)
   }
 
-  val apiServerEndpointUri = "http://localhost/epaye/provide-token"
+  val apiServerEndpointUri = "http://localhost:9001/epaye/provide-token"
 
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
-    case class Token(value: String, scope: String, expiresAt: Date)
-    implicit val tokenFormat = Json.format[Token]
+
 
     val expiresIn = t.expiresIn.getOrElse(0L)
     val expiresAt = new DateTime(t.createdAt.getTime).plusSeconds(expiresIn.toInt)
     val token = Token(t.accessToken, t.scope.get, new Date(expiresAt.getMillis))
 
-    val json = Json.toJson()
+    val json = Json.toJson(token)
 
-    ws.url(apiServerEndpointUri).withBody(json).put().map(_ => ())
+    ws.url(apiServerEndpointUri).put(json).map(_ => ())
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUserRow], refreshToken: String): Future[AccessToken] = ???

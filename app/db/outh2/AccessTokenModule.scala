@@ -42,7 +42,7 @@ trait AccessTokenModule extends DBModule {
 
     def refreshToken = column[Option[String]]("REFRESH_TOKEN")
 
-    def userId = column[Long]("DAS_USER_ID")
+    def userId = column[Long]("GATEWAY_USER_ID")
 
     def scope = column[Option[String]]("SCOPE")
 
