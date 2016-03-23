@@ -17,12 +17,12 @@ trait GatewayEnrolmentModule extends DBModule {
 
   val GatewayEnrolments = TableQuery[GatewayEnrolmentTable]
 
-  class GatewayEnrolmentTable(tag: Tag) extends Table[GatewayEnrolmentRow](tag, "GATEWAY_ENROLMENT") {
-    def gatewayUserId = column[Long]("GATEWAY_USER_ID")
+  class GatewayEnrolmentTable(tag: Tag) extends Table[GatewayEnrolmentRow](tag, "gateway_enrolment") {
+    def gatewayUserId = column[Long]("gateway_user_id")
 
     def gatewayUserFk = foreignKey("enrolment_user", gatewayUserId, GatewayUsers)(_.id, onDelete = ForeignKeyAction.Cascade)
 
-    def empref = column[String]("EMPREF")
+    def empref = column[String]("empref")
 
     def schemeFk = foreignKey("enrolment_scheme", empref, Schemes)(_.empref, onDelete = ForeignKeyAction.Cascade)
 

@@ -25,20 +25,20 @@ trait AuthCodeModule extends DBModule {
 
   val AuthCodes = TableQuery[AuthCodeTable]
 
-  class AuthCodeTable(tag: Tag) extends Table[AuthCodeRow](tag, "AUTH_CODES") {
-    def authorizationCode = column[String]("AUTHORIZATION_CODE", O.PrimaryKey)
+  class AuthCodeTable(tag: Tag) extends Table[AuthCodeRow](tag, "auth_codes") {
+    def authorizationCode = column[String]("authorization_code", O.PrimaryKey)
 
-    def userId = column[Long]("GATEWAY_USER_ID")
+    def userId = column[Long]("gateway_user_id")
 
-    def redirectUri = column[Option[String]]("REDIRECT_URI")
+    def redirectUri = column[Option[String]]("redirect_uri")
 
-    def createdAt = column[Date]("CREATED_AT")
+    def createdAt = column[Date]("created_at")
 
-    def scope = column[Option[String]]("SCOPE")
+    def scope = column[Option[String]]("scope")
 
-    def clientId = column[Option[String]]("CLIENT_ID")
+    def clientId = column[Option[String]]("client_id")
 
-    def expiresIn = column[Int]("EXPIRES_IN")
+    def expiresIn = column[Int]("expires_in")
 
     def * = (authorizationCode, userId, redirectUri, createdAt, scope, clientId, expiresIn) <>(AuthCodeRow.tupled, AuthCodeRow.unapply)
   }

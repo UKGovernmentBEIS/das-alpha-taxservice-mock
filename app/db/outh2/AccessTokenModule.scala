@@ -37,20 +37,20 @@ trait AccessTokenModule extends DBModule {
     } yield a.result
   }
 
-  class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "ACCESS_TOKEN") {
-    def accessToken = column[String]("ACCESS_TOKEN", O.PrimaryKey)
+  class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "access_token") {
+    def accessToken = column[String]("access_token", O.PrimaryKey)
 
-    def refreshToken = column[Option[String]]("REFRESH_TOKEN")
+    def refreshToken = column[Option[String]]("refresh_token")
 
-    def userId = column[Long]("GATEWAY_USER_ID")
+    def userId = column[Long]("gateway_user_id")
 
-    def scope = column[Option[String]]("SCOPE")
+    def scope = column[Option[String]]("scope")
 
-    def expiresIn = column[Option[Long]]("EXPIRES_IN")
+    def expiresIn = column[Option[Long]]("expires_in")
 
-    def createdAt = column[Date]("CREATED_AT")
+    def createdAt = column[Date]("created_at")
 
-    def clientId = column[Option[String]]("CLIENT_ID")
+    def clientId = column[Option[String]]("client_id")
 
     def * = (accessToken, refreshToken, userId, scope, expiresIn, createdAt, clientId) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 

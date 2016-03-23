@@ -25,13 +25,13 @@ trait GatewayUserModule extends DBModule {
 
   def byName(s: String): Future[Option[GatewayUserRow]] = db.run(GatewayUsers.filter(u => u.name === s).result.headOption)
 
-  class GatewayUserTable(tag: Tag) extends Table[GatewayUserRow](tag, "GATEWAY_USER") {
+  class GatewayUserTable(tag: Tag) extends Table[GatewayUserRow](tag, "gateway_user") {
 
-    def id = column[Long]("ID", O.PrimaryKey)
+    def id = column[Long]("id", O.PrimaryKey)
 
-    def name = column[String]("USERNAME")
+    def name = column[String]("username")
 
-    def password = column[String]("PASSWORD")
+    def password = column[String]("password")
 
     def * = (id, name, password) <>(GatewayUserRow.tupled, GatewayUserRow.unapply)
 
