@@ -25,6 +25,7 @@ object Token {
 
 @Singleton
 class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO, gatewayUsers: GatewayUserDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayUserRow] {
+
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
       case Some(cred) => clients.validate(cred.clientId, cred.clientSecret, request.grantType)
@@ -82,30 +83,25 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
   }
 
   override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUserRow]]] = {
-    val ot = for {
+    for {
       at <- OptionT(accessTokens.forRefreshToken(refreshToken))
       u <- OptionT(gatewayUsers.byId(at.userId))
     } yield AuthInfo(u, at.clientId, at.scope, None)
-
-    ot.value
-  }
+  }.value
 
 
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUserRow]): Future[Option[AccessToken]] = {
-    OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map {
-      token =>
-        AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, token.createdAt)
-    }.value
-  }
+    OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map { token =>
+      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, token.createdAt)
+    }
+  }.value
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayUserRow]]] = {
-    val ot = for {
+    for {
       token <- OptionT(authCodeDAO.find(code))
       user <- OptionT(gatewayUsers.byId(token.userId))
     } yield AuthInfo(user, token.clientId, token.scope, token.redirectUri)
-
-    ot.value
-  }
+  }.value
 
   override def deleteAuthCode(code: String): Future[Unit] = authCodeDAO.delete(code).map(_ => ())
 
@@ -114,12 +110,10 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
   override def findAccessToken(token: String): Future[Option[AccessToken]] = ???
 
   override def findUser(request: AuthorizationRequest): Future[Option[GatewayUserRow]] = {
-    request.clientCredential.map {
-      cred =>
-        gatewayUsers.byName(cred.clientId).map(_.filter(u => BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)))
-    } match {
-      case None => Future.successful(None)
-      case Some(f) => f
+    OptionT.fromOption(request.clientCredential).flatMap { cred =>
+      OptionT(gatewayUsers.byName(cred.clientId)).filter { u =>
+        BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)
+      }
     }
-  }
+  }.value
 }
