@@ -6,7 +6,8 @@
 
 @main("Login in to Government Gateway") {
     <div>
-        <h1>Login to Government Gateway</h1>
+        <h2>Digital Tax Platform</h2>
+        <h3>Log in with your Government Gateway ID</h3>
         <form method="post" action="@GatewayLoginController.handleLogin()">
             <div id="errors">
             @form.errors.map { e => <div>@e.messages.head</div> }

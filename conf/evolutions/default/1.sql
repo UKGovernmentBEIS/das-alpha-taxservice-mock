@@ -29,7 +29,6 @@ INSERT INTO "gateway_enrolment" ("gateway_user_id", "empref") VALUES (1, '123/BC
 INSERT INTO "gateway_enrolment" ("gateway_user_id", "empref") VALUES (1, '321/ZX54321');
 INSERT INTO "gateway_enrolment" ("gateway_user_id", "empref") VALUES (2, '222/MM22222');
 
-
 create table "client" (
     "id" VARCHAR NOT NULL PRIMARY KEY,
     "secret" VARCHAR NULL,
@@ -49,9 +48,6 @@ CREATE TABLE "auth_codes" (
     "client_id" VARCHAR NULL,
     "expires_in" INTEGER NOT NULL
 );
-
-INSERT INTO "auth_codes" ("authorization_code", "gateway_user_id", "redirect_uri", "created_at", "scope", "client_id", "expires_in")
-    VALUES ('doug_code', 1, 'http://localhost:9000/', now(), '', 'client1', 100000);
 
 CREATE TABLE "access_token" (
     "access_token" VARCHAR NOT NULL PRIMARY KEY,

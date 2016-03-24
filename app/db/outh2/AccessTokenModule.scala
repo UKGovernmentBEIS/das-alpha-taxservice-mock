@@ -24,18 +24,6 @@ trait AccessTokenModule extends DBModule {
 
   val AccessTokens = TableQuery[AccessTokenTable]
 
-  def all(): Future[Seq[AccessTokenRow]] = db.run(AccessTokens.result)
-
-  def find(userId:Long, clientId:Option[String]):Future[Option[AccessTokenRow]] = db.run {
-    AccessTokens.filter(at => at.userId === userId && at.clientId == clientId).result.headOption
-  }
-
-  def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
-    for {
-      _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.userId === token.userId).delete
-      a <- AccessTokens += token
-    } yield a.result
-  }
 
   class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "access_token") {
     def accessToken = column[String]("access_token", O.PrimaryKey)
@@ -58,4 +46,23 @@ trait AccessTokenModule extends DBModule {
 
 }
 
-class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AccessTokenModule
+class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AccessTokenModule {
+
+  import driver.api._
+
+  def forRefreshToken(refreshToken: String): Future[Option[AccessTokenRow]] = db.run {
+    AccessTokens.filter(_.refreshToken === refreshToken).result.headOption
+  }
+
+  def find(userId: Long, clientId: Option[String]): Future[Option[AccessTokenRow]] = db.run {
+    AccessTokens.filter(at => at.userId === userId && at.clientId == clientId).result.headOption
+  }
+
+  def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
+    for {
+      _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.userId === token.userId).delete
+      a <- AccessTokens += token
+    } yield a.result
+  }
+
+}

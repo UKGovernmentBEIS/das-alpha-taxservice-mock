@@ -1,10 +1,23 @@
-@import db.gateway.GatewayUserRow
 @(empref: String, clientId: String, redirectUri: String)
 
 @main(s"Claiming empref $empref") {
     <div>
-        <h3>User would like to claim EmpRef @empref</h3>
-        <a href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri)">Confirm</a>
-        <a href="">Deny</a>
+        <h2>Digital Tax Platform</h2>
+        <h3>The Digital Apprenticeship Service would like to access information about a PAYE scheme with Employer Reference @empref</h3>
+        <div>
+            <h4>The application <em>will</em> be able to:</h4>
+            <ul>
+                <li>See details of levy declarations made against this payroll scheme</li>
+                <li>See the termination date of the payroll scheme (if any)</li>
+            </ul>
+            <h4>The application <em>will not</em> be able to:</h4>
+            <ul>
+                <li>See any other information about the payroll scheme</li>
+                <li>Submit any information on behalf of the payroll scheme</li>
+            </ul>
+        </div>
+        <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri)">
+            Allow access</a>
+        <a class="button" href="">Do not allow access</a>
     </div>
 }

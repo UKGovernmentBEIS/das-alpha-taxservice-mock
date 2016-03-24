@@ -12,7 +12,7 @@ trait MyOAuth extends OAuth2Provider {
   override val tokenEndpoint: TokenEndpoint = new TokenEndpoint {
     override val handlers: Map[String, GrantHandler] = Map(
       OAuthGrantType.AUTHORIZATION_CODE -> new AuthorizationCode,
-      OAuthGrantType.CLIENT_CREDENTIALS -> new ClientCredentials
+      OAuthGrantType.REFRESH_TOKEN -> new RefreshToken
     )
   }
 }

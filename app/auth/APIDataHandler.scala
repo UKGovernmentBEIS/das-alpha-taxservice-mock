@@ -57,8 +57,6 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
   val apiServerEndpointUri = "http://localhost:9001/epaye/provide-token"
 
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
-
-
     val expiresIn = t.expiresIn.getOrElse(0L)
     val expiresAt = new DateTime(t.createdAt.getTime).plusSeconds(expiresIn.toInt)
     val token = Token(t.accessToken, t.scope.get, new Date(expiresAt.getMillis))
@@ -68,13 +66,35 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
     ws.url(apiServerEndpointUri).put(json).map(_ => ())
   }
 
-  override def refreshAccessToken(authInfo: AuthInfo[GatewayUserRow], refreshToken: String): Future[AccessToken] = ???
+  override def refreshAccessToken(authInfo: AuthInfo[GatewayUserRow], refreshToken: String): Future[AccessToken] = {
+    val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
+    val accessToken = generateToken
+    val createdAt = new Date(System.currentTimeMillis())
 
-  override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUserRow]]] = ???
+    accessTokens.forRefreshToken(refreshToken).flatMap {
+      case Some(accessTokenRow) =>
+        val updatedRow = accessTokenRow.copy(accessToken = accessToken, createdAt = createdAt)
+        for {
+          _ <- accessTokens.deleteExistingAndCreate(updatedRow)
+          _ <- sendTokenToApiServer(updatedRow)
+        } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, createdAt)
+    }
+  }
+
+  override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUserRow]]] = {
+    val ot = for {
+      at <- OptionT(accessTokens.forRefreshToken(refreshToken))
+      u <- OptionT(gatewayUsers.byId(at.userId))
+    } yield AuthInfo(u, at.clientId, at.scope, None)
+
+    ot.value
+  }
+
 
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUserRow]): Future[Option[AccessToken]] = {
-    OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map { token =>
-      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, token.createdAt)
+    OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map {
+      token =>
+        AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, token.createdAt)
     }.value
   }
 
@@ -94,8 +114,9 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
   override def findAccessToken(token: String): Future[Option[AccessToken]] = ???
 
   override def findUser(request: AuthorizationRequest): Future[Option[GatewayUserRow]] = {
-    request.clientCredential.map { cred =>
-      gatewayUsers.byName(cred.clientId).map(_.filter(u => BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)))
+    request.clientCredential.map {
+      cred =>
+        gatewayUsers.byName(cred.clientId).map(_.filter(u => BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)))
     } match {
       case None => Future.successful(None)
       case Some(f) => f
