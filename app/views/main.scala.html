@@ -1,8 +1,10 @@
 @(title: String, mainClass: Option[String] = None, bodyEnd: Html = Html(""), headExtra: Html = Html(""), links: Html = Html(""))(content: Html)
 
 @head = {
-    <link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet" type="text/css" />
     <link href="@routes.Assets.at("stylesheets/elements.css")" media="screen" rel="stylesheet" type="text/css" />
+    <link href="@routes.Assets.at("stylesheets/application.css")" media="screen" rel="stylesheet" type="text/css" />
+    <link href="@routes.Assets.at("stylesheets/patterns.css")" media="screen" rel="stylesheet" type="text/css" />
+    <link href="@routes.Assets.at("stylesheets/govuk-template.css")" media="screen" rel="stylesheet" type="text/css" />
 @headExtra
 }
 

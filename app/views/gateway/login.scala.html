@@ -1,26 +1,40 @@
-@import play.api.data.Form
 @import controllers.gateway.UserData
-@import controllers.gateway.routes.GatewayLoginController
+@import play.api.data.Form
 
 @(form: Form[UserData])
 
-@main("Login in to Government Gateway") {
-    <div>
-        <h2>Digital Tax Platform</h2>
-        <h3>Log in with your Government Gateway ID</h3>
-        <form method="post" action="@GatewayLoginController.handleLogin()">
-            <div id="errors">
-            @form.errors.map { e => <div>@e.messages.head</div> }
+    @main("Login in to Government Gateway") {
+        <div>
+            <div class="alpha-banner">
+                <p>
+                    <strong class="phase-tag">ALPHA</strong>
+                    <span>This is a trial service. Help us improve it - send your
+                        <a href="">feedback</a>.</span>
+                </p>
             </div>
-            <div>
-                <label for="username">User name:</label>
-                <input type="text" id="username" name="username" value="@form.value.getOrElse("")"/>
-            </div>
-            <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password"/>
-            </div>
-            <div><input type="submit" value="Login"/> </div>
-        </form>
-    </div>
-}
+            <h2>Digital Tax Platform</h2>
+            <h3>Log in with your Government Gateway ID</h3>
+            <form method="post" action="@controllers.gateway.routes.GatewayLoginController.handleLogin()">
+                <div id="errors">
+                @form.errors.map { e => <div>@e.messages.head</div> }
+                </div>
+                <fieldset class="form-field-group">
+                    <div class="form-field">
+                        <label for="username">
+                            User name
+                            <input type="text" id="username" name="username" value="@form.value.getOrElse("")"/>
+                        </label>
+                    </div>
+                    <div class="form-field">
+                        <label for="password">
+                            Password
+                            <input type="password" id="password" name="password"/>
+                        </label>
+                    </div>
+                    <div class="form-field">
+                        <input class="button" type="submit" value="Login"/>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    }

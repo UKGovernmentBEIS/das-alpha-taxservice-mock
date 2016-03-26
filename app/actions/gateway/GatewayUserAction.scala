@@ -15,7 +15,7 @@ class GatewayUserAction @Inject()(gatewayUsers: GatewayUserDAO)(implicit ec: Exe
   extends ActionBuilder[GatewayUserRequest]
     with ActionRefiner[Request, GatewayUserRequest] {
 
-  val sessionKey = "ggUserId"
+  val sessionKey = "mtdpId"
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, GatewayUserRequest[A]]] = {
     implicit val rh: RequestHeader = request
