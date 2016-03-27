@@ -1,9 +1,8 @@
 @(title: String, mainClass: Option[String] = None, bodyEnd: Html = Html(""), headExtra: Html = Html(""), links: Html = Html(""))(content: Html)
 
 @head = {
-    <link href="@routes.Assets.at("stylesheets/elements.css")" media="screen" rel="stylesheet" type="text/css" />
+    <link href="@routes.Assets.at("stylesheets/fonts.css")" media="screen" rel="stylesheet" type="text/css" />
     <link href="@routes.Assets.at("stylesheets/application.css")" media="screen" rel="stylesheet" type="text/css" />
-    <link href="@routes.Assets.at("stylesheets/patterns.css")" media="screen" rel="stylesheet" type="text/css" />
     <link href="@routes.Assets.at("stylesheets/govuk-template.css")" media="screen" rel="stylesheet" type="text/css" />
 @headExtra
 }
@@ -14,15 +13,19 @@
 @insideHeader = {
     <div class="header-proposition">
         <div class="content">
-            <nav id="proposition-menu">
-                <a href="" id="proposition-name">HM Revenue &amp; Customs</a>
-            </nav>
         </div>
     </div>
 }
 
 @layouts.govuk_template2(Some(title), None)(head, empty, bodyEnd, insideHeader, empty, empty) {
     <main id="content" class="@mainClass" role="main">
+        <div class="service-info ">
+
+            <div class="logo">
+                <span class="organisation-logo organisation-logo-medium">HM Revenue &amp; Customs</span>
+            </div>
+
+        </div>
     @content
 
     </main>

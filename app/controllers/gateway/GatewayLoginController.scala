@@ -10,14 +10,14 @@ import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class UserData(name: String, password: String)
+case class UserData(userId: String, password: String)
 
 @Singleton
 class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserAction: GatewayUserAction)(implicit exec: ExecutionContext) extends Controller {
 
   val userForm = Form(
     mapping(
-      "username" -> text,
+      "userId" -> text,
       "password" -> text
     )(UserData.apply)(UserData.unapply)
   )
@@ -30,7 +30,7 @@ class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActio
     userForm.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(views.html.gateway.login(formWithErrors))),
       userData => {
-        gatewayUserDAO.validate(userData.name, userData.password).map {
+        gatewayUserDAO.validate(userData.userId, userData.password).map {
           case Some(user) =>
             request.session.get("uri") match {
               case Some(uri) => Redirect(uri).removingFromSession("uri").addingToSession((UserAction.sessionKey, user.id.toString))
