@@ -19,15 +19,15 @@ class GatewayUserAction @Inject()(gatewayUsers: GatewayUserDAO)(implicit ec: Exe
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, GatewayUserRequest[A]]] = {
     implicit val rh: RequestHeader = request
-    val login = Left(Redirect(controllers.gateway.routes.GatewayLoginController.showLogin()).addingToSession("uri" -> request.uri))
+    val redirectToSignIn = Left(Redirect(controllers.gateway.routes.GatewaySignInController.showSignIn()).addingToSession("uri" -> request.uri))
 
     request.session.get(sessionKey) match {
-      case None => Future.successful(login)
+      case None => Future.successful(redirectToSignIn)
       case Some(ParseLong(id)) => gatewayUsers.byId(id).map {
         case Some(u) => Right(new GatewayUserRequest(request, u))
-        case None => login
+        case None => redirectToSignIn
       }
-      case Some(s) => Future.successful(login)
+      case Some(s) => Future.successful(redirectToSignIn)
     }
   }
 }

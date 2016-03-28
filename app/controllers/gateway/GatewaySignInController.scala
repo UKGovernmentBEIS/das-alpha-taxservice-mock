@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class UserData(userId: String, password: String)
 
 @Singleton
-class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserAction: GatewayUserAction)(implicit exec: ExecutionContext) extends Controller {
+class GatewaySignInController @Inject()(gatewayUserDAO: GatewayUserDAO, UserAction: GatewayUserAction)(implicit exec: ExecutionContext) extends Controller {
 
   val userForm = Form(
     mapping(
@@ -22,13 +22,13 @@ class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActio
     )(UserData.apply)(UserData.unapply)
   )
 
-  def showLogin = Action {
-    Ok(views.html.gateway.login(userForm))
+  def showSignIn = Action {
+    Ok(views.html.gateway.signIn(userForm))
   }
 
-  def handleLogin = Action.async { implicit request =>
+  def handleSignIn = Action.async { implicit request =>
     userForm.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(views.html.gateway.login(formWithErrors))),
+      formWithErrors => Future.successful(BadRequest(views.html.gateway.signIn(formWithErrors))),
       userData => {
         gatewayUserDAO.validate(userData.userId, userData.password).map {
           case Some(user) =>
@@ -36,13 +36,13 @@ class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActio
               case Some(uri) => Redirect(uri).removingFromSession("uri").addingToSession((UserAction.sessionKey, user.id.toString))
               case None => Redirect(controllers.gateway.routes.ApplicationController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
             }
-          case None => Ok(views.html.gateway.login(userForm.withError("username", "Bad user name or password")))
+          case None => Ok(views.html.gateway.signIn(userForm.withError("username", "Bad user name or password")))
         }
       }
     )
   }
 
-  def logout = Action {
-    Redirect(controllers.gateway.routes.GatewayLoginController.showLogin()).withNewSession
+  def signOut = Action {
+    Redirect(controllers.gateway.routes.GatewaySignInController.showSignIn()).withNewSession
   }
 }

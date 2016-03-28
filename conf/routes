@@ -7,9 +7,9 @@ GET         /assets/*file           controllers.Assets.at(path="/public", file)
 
 GET         /                       controllers.gateway.ApplicationController.index
 
-GET         /gateway/login          controllers.gateway.GatewayLoginController.showLogin
-POST        /gateway/login          controllers.gateway.GatewayLoginController.handleLogin
-GET         /gateway/logout         controllers.gateway.GatewayLoginController.logout
+GET         /gateway/signin          controllers.gateway.GatewaySignInController.showSignIn
+POST        /gateway/signin          controllers.gateway.GatewaySignInController.handleSignIn
+GET         /gateway/signout         controllers.gateway.GatewaySignInController.signOut
 
 POST        /oauth/token           controllers.security.OAuth2Controller.accessToken
 GET         /oauth/authorize        controllers.gateway.ClaimAuthController.auth(scope:String, clientId:String, redirectURI :String)
