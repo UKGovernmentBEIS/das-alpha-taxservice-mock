@@ -1,28 +1,57 @@
 @(empref: String, clientId: String, redirectUri: String)
 
-@main(s"Claiming empref $empref") {
+@proposition = {
+    <div class="header-proposition">
+        <div class="content">
+            <nav id="proposition-menu" class="header__menu" role="navigation">
+                <span class="header__menu__proposition-name">Business tax account</span>
+
+                <ul id="proposition-links" class="header__menu__proposition-links">
+                    <li><a id="logOutNavHref" href="@controllers.gateway.routes.GatewayLoginController.logout()" data-journey-click="primary-navigation:Click:Sign out">
+                        Sign out</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+}
+
+@main(s"Claiming empref $empref", insideHeader = proposition) {
     <div class="alpha-banner">
         <p>
             <strong class="phase-tag">ALPHA</strong>
-            <span>This is a trial service. Help us improve it - send your
-                <a href="">feedback</a>.</span>
+            <span>
+                This is a trial service. Help us improve it - send your
+                <a href="">feedback</a>
+                .
+            </span>
         </p>
     </div>
     <div>
         <article class="content__body">
             <h2>The Digital Apprenticeship Service would like to access information about your PAYE scheme with Employer Reference @empref</h2>
-            <div class="panel">
-                <h2>The application <em>will</em> be able to:</h2>
+            <div class="panel-indent">
+                <h2>
+                    The application
+                    <em>will</em>
+                    be able to:
+                </h2>
                 <p>See details of levy declarations made against this payroll scheme</p>
                 <p>See the termination date of the payroll scheme (if any)</p>
             </div>
-            <div class="panel">
-                <h2>The application <em>will not</em> be able to:</h2>
+            <p/>
+            <div class="panel-indent">
+                <h2>
+                    The application
+                    <em>will not</em>
+                    be able to:
+                </h2>
                 <p>See any other information about the payroll scheme</p>
                 <p>Submit any information on behalf of the payroll scheme</p>
             </div>
+            <p/>
             <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri)">
-                Allow access</a>
+                Allow access
+            </a>
             <a class="button" href="">Do not allow access</a>
         </article>
     </div>
