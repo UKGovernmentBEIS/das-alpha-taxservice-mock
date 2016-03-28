@@ -52,7 +52,7 @@
             <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri)">
                 Allow access
             </a>
-            <a class="button" href="">Do not allow access</a>
+            <a class="button" href="@controllers.gateway.routes.ClaimAuthController.deny(redirectUri)">Do not allow access</a>
         </article>
     </div>
 }

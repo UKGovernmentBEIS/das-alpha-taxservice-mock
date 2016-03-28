@@ -29,12 +29,12 @@ class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: 
   def confirm(empref: String, clientId: String, redirectUri: String) = UserAction.async { implicit request =>
     val authCode = generateToken
     authCodeDAO.create(authCode, request.user.id, clientId, empref).map { _ =>
-      Redirect(s"$redirectUri?code=$authCode")
+      Redirect(s"$redirectUri?code=$authCode").removingFromSession(UserAction.sessionKey)
     }
   }
 
-  def deny(redirectUri: String) = Action {
-    Redirect(redirectUri)
+  def deny(redirectUri: String) = Action { implicit r =>
+    Redirect(redirectUri).removingFromSession(UserAction.sessionKey)
   }
 
 }
