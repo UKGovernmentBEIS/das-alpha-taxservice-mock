@@ -1,9 +1,8 @@
-package controllers.gateway
+package db
 
 import java.sql.Date
 import javax.inject.{Inject, Singleton}
 
-import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}

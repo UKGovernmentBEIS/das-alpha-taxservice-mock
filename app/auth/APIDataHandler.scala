@@ -17,7 +17,7 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
 
-case class Token(value: String, scope: String, expiresAt: Date)
+case class Token(value: String, scope: String, expiresAt: Long)
 
 object Token {
   implicit val formats = Json.format[Token]
@@ -60,7 +60,7 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
     val expiresIn = t.expiresIn.getOrElse(0L)
     val expiresAt = new DateTime(t.createdAt.getTime).plusSeconds(expiresIn.toInt)
-    val token = Token(t.accessToken, t.scope.get, new Date(expiresAt.getMillis))
+    val token = Token(t.accessToken, t.scope.get, expiresAt.getMillis)
 
     val json = Json.toJson(token)
 

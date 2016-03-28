@@ -2,8 +2,7 @@ package db.gateway
 
 import javax.inject.{Inject, Singleton}
 
-import controllers.gateway.SchemeModule
-import db.DBModule
+import db.{DBModule, SchemeModule}
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.ExecutionContext
