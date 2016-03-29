@@ -14,7 +14,7 @@ case class AccessTokenRow(
                            userId: Long, scope: Option[String],
                            expiresIn: Option[Long],
                            createdAt: Date,
-                           clientId: Option[String])
+                           clientId: String)
 
 trait AccessTokenModule extends DBModule {
 
@@ -38,7 +38,7 @@ trait AccessTokenModule extends DBModule {
 
     def createdAt = column[Date]("created_at")
 
-    def clientId = column[Option[String]]("client_id")
+    def clientId = column[String]("client_id")
 
     def * = (accessToken, refreshToken, userId, scope, expiresIn, createdAt, clientId) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 

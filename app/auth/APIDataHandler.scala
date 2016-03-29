@@ -12,13 +12,14 @@ import db.outh2._
 import org.apache.commons.codec.binary.Hex
 import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
 
-case class Token(value: String, scope: String, expiresAt: Long)
+case class Token(value: String, scope: String, clientId: String, expiresAt: Long)
 
 object Token {
   implicit val formats = Json.format[Token]
@@ -50,7 +51,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
     val createdAt = new Date(System.currentTimeMillis())
-    val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.id, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId)
+    val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.id, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
 
     for {
       _ <- accessTokens.deleteExistingAndCreate(tokenRow)
@@ -61,9 +62,10 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
     val expiresIn = t.expiresIn.getOrElse(0L)
     val expiresAt = new DateTime(t.createdAt.getTime).plusSeconds(expiresIn.toInt)
-    val token = Token(t.accessToken, t.scope.get, expiresAt.getMillis)
+    val token = Token(t.accessToken, t.scope.get, t.clientId, expiresAt.getMillis)
 
     val json = Json.toJson(token)
+    Logger.info(Json.prettyPrint(json))
 
     ws.url(s"$apiServerEndpointUri/provide-token").put(json).map(_ => ())
   }
@@ -87,7 +89,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     for {
       at <- OptionT(accessTokens.forRefreshToken(refreshToken))
       u <- OptionT(gatewayUsers.byId(at.userId))
-    } yield AuthInfo(u, at.clientId, at.scope, None)
+    } yield AuthInfo(u, Some(at.clientId), at.scope, None)
   }.value
 
 
