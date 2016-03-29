@@ -6,6 +6,7 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.std.future._
+import config.ServiceConfig
 import db.gateway.{GatewayUserDAO, GatewayUserRow}
 import db.outh2._
 import org.apache.commons.codec.binary.Hex
@@ -24,7 +25,9 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO, gatewayUsers: GatewayUserDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayUserRow] {
+class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO, gatewayUsers: GatewayUserDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayUserRow] {
+
+  import config._
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
@@ -55,9 +58,6 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
     } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, createdAt)
   }
 
-  // TODO: Read this from config
-  val apiServerEndpointUri = "https://das-alpha-hmrc-api-mock.herokuapp.com/epaye/provide-token"
-
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
     val expiresIn = t.expiresIn.getOrElse(0L)
     val expiresAt = new DateTime(t.createdAt.getTime).plusSeconds(expiresIn.toInt)
@@ -65,7 +65,7 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
 
     val json = Json.toJson(token)
 
-    ws.url(apiServerEndpointUri).put(json).map(_ => ())
+    ws.url(s"$apiServerEndpointUri/provide-token").put(json).map(_ => ())
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUserRow], refreshToken: String): Future[AccessToken] = {
