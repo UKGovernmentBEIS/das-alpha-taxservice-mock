@@ -55,7 +55,8 @@ class APIDataHandler @Inject()(ws: WSClient, clients: ClientDAO, accessTokens: A
     } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, createdAt)
   }
 
-  val apiServerEndpointUri = "http://localhost:9001/epaye/provide-token"
+  // TODO: Read this from config
+  val apiServerEndpointUri = "https://das-alpha-hmrc-api-mock.herokuapp.com/epaye/provide-token"
 
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
     val expiresIn = t.expiresIn.getOrElse(0L)
