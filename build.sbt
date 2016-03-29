@@ -6,7 +6,7 @@ enablePlugins(PlayScala)
 
 scalaVersion := "2.11.8"
 
-PlayKeys.playDefaultPort := 9002
+PlayKeys.devSettings := Seq("play.server.http.port" -> "9002")
 
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 resolvers += "Madoushi sbt-plugins" at "https://dl.bintray.com/madoushi/sbt-plugins/"

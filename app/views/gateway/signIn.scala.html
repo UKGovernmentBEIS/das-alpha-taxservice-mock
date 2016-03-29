@@ -1,7 +1,18 @@
 @import controllers.gateway.UserData
 @import play.api.data.Form
 @(form: Form[UserData])
-    @main("Login in to Government Gateway") {
+
+    @proposition = {
+        <div class="header-proposition">
+            <div class="content">
+                <nav id="proposition-menu" class="header__menu" role="navigation">
+                    <span class="header__menu__proposition-name">Business tax account</span>
+                </nav>
+            </div>
+        </div>
+    }
+
+    @main("Login in to Government Gateway", insideHeader = proposition) {
         <div>
             <div class="alpha-banner">
                 <p>
