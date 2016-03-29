@@ -18,5 +18,3 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.0")
 addSbtPlugin("org.irundaia.sbt" % "sbt-sassify" % "1.4.2")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
-
-addSbtPlugin("org.madoushi.sbt" % "sbt-sass" % "0.9.3")
