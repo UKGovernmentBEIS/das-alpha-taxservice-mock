@@ -37,14 +37,15 @@ CREATE TABLE "client" (
   "grant_type"   VARCHAR NOT NULL
 );
 
-INSERT INTO "client" ("id", "secret", "redirect_uri", "scope", "grant_type")
-VALUES ('client1', 'secret1', '', '', 'authorization_code');
+INSERT INTO "client" ("id", "secret", "redirect_uri", "scope", "grant_type") VALUES ('client1', 'secret1', '', '', 'authorization_code');
+INSERT INTO "client" ("id", "secret", "redirect_uri", "scope", "grant_type") VALUES ('daniel.ashton@valtech.co.uk', 'password', '', '', 'authorization_code');
+INSERT INTO "client" ("id", "secret", "redirect_uri", "scope", "grant_type") VALUES ('ian.russell@valtech.co.uk', 'password', '', '', 'authorization_code');
 
 CREATE TABLE "auth_codes" (
   "authorization_code" VARCHAR NOT NULL PRIMARY KEY,
   "gateway_user_id"    INTEGER NOT NULL REFERENCES "gateway_user",
   "redirect_uri"       VARCHAR NOT NULL,
-  "created_at"         DATE    NOT NULL,
+  "created_at"         BIGINT  NOT NULL,
   "scope"              VARCHAR NULL,
   "client_id"          VARCHAR NOT NULL,
   "expires_in"         INTEGER NOT NULL
@@ -56,7 +57,7 @@ CREATE TABLE "access_token" (
   "gateway_user_id" INTEGER NOT NULL REFERENCES "gateway_user",
   "scope"           VARCHAR NULL,
   "expires_in"      INTEGER NOT NULL,
-  "created_at"      DATE    NOT NULL,
+  "created_at"      BIGINT  NOT NULL,
   "client_id"       VARCHAR NOT NULL
 );
 

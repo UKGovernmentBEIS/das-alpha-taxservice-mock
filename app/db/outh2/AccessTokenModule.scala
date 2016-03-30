@@ -1,6 +1,5 @@
 package db.outh2
 
-import java.sql.Date
 import javax.inject.Inject
 
 import db.DBModule
@@ -13,7 +12,7 @@ case class AccessTokenRow(
                            refreshToken: Option[String],
                            userId: Long, scope: Option[String],
                            expiresIn: Option[Long],
-                           createdAt: Date,
+                           createdAt: Long,
                            clientId: String)
 
 trait AccessTokenModule extends DBModule {
@@ -36,7 +35,7 @@ trait AccessTokenModule extends DBModule {
 
     def expiresIn = column[Option[Long]]("expires_in")
 
-    def createdAt = column[Date]("created_at")
+    def createdAt = column[Long]("created_at")
 
     def clientId = column[String]("client_id")
 

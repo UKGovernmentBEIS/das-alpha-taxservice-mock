@@ -1,6 +1,5 @@
 package db.outh2
 
-import java.sql.Date
 import javax.inject.Inject
 
 import db.DBModule
@@ -8,20 +7,11 @@ import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthCodeRow(authorizationCode: String, userId: Long, redirectUri: String, createdAt: Date, scope: Option[String], clientId: Option[String], expiresIn: Int)
+case class AuthCodeRow(authorizationCode: String, userId: Long, redirectUri: String, createdAt: Long, scope: Option[String], clientId: Option[String], expiresIn: Int)
 
 trait AuthCodeModule extends DBModule {
 
   import driver.api._
-
-  def find(code: String): Future[Option[AuthCodeRow]] = db.run(AuthCodes.filter(_.authorizationCode === code).result.headOption)
-
-  def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
-
-  def create(code: String, gatewayUserId: Long, redirectUri: String, clientId: String, empref: String): Future[Int] = {
-    val r = AuthCodeRow(code, gatewayUserId, redirectUri, new Date(System.currentTimeMillis()), Some(empref), Some(clientId), 100000)
-    db.run(AuthCodes += r)
-  }
 
   val AuthCodes = TableQuery[AuthCodeTable]
 
@@ -32,7 +22,7 @@ trait AuthCodeModule extends DBModule {
 
     def redirectUri = column[String]("redirect_uri")
 
-    def createdAt = column[Date]("created_at")
+    def createdAt = column[Long]("created_at")
 
     def scope = column[Option[String]]("scope")
 
@@ -45,4 +35,16 @@ trait AuthCodeModule extends DBModule {
 
 }
 
-class AuthCodeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AuthCodeModule
+class AuthCodeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AuthCodeModule {
+
+  import driver.api._
+
+  def find(code: String): Future[Option[AuthCodeRow]] = db.run(AuthCodes.filter(_.authorizationCode === code).result.headOption)
+
+  def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
+
+  def create(code: String, gatewayUserId: Long, redirectUri: String, clientId: String, empref: String): Future[Int] = {
+    val r = AuthCodeRow(code, gatewayUserId, redirectUri, System.currentTimeMillis(), Some(empref), Some(clientId), 100000)
+    db.run(AuthCodes += r)
+  }
+}

@@ -1,7 +1,7 @@
 package auth
 
 import java.security.SecureRandom
-import java.sql.Date
+import java.util.Date
 import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
@@ -50,18 +50,18 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
-    val createdAt = new Date(System.currentTimeMillis())
+    val createdAt = System.currentTimeMillis()
     val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.id, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
 
     for {
       _ <- accessTokens.deleteExistingAndCreate(tokenRow)
       _ <- sendTokenToApiServer(tokenRow)
-    } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, createdAt)
+    } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
   }
 
   def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
     val expiresIn = t.expiresIn.getOrElse(0L)
-    val expiresAt = new DateTime(t.createdAt.getTime).plusSeconds(expiresIn.toInt)
+    val expiresAt = new DateTime(t.createdAt).plusSeconds(expiresIn.toInt)
     val token = Token(t.accessToken, t.scope.get, t.clientId, expiresAt.getMillis)
 
     val json = Json.toJson(token)
@@ -73,7 +73,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUserRow], refreshToken: String): Future[AccessToken] = {
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val accessToken = generateToken
-    val createdAt = new Date(System.currentTimeMillis())
+    val createdAt = System.currentTimeMillis()
 
     accessTokens.forRefreshToken(refreshToken).flatMap {
       case Some(accessTokenRow) =>
@@ -81,7 +81,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
         for {
           _ <- accessTokens.deleteExistingAndCreate(updatedRow)
           _ <- sendTokenToApiServer(updatedRow)
-        } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, createdAt)
+        } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
     }
   }
 
@@ -95,7 +95,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
 
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUserRow]): Future[Option[AccessToken]] = {
     OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map { token =>
-      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, token.createdAt)
+      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
     }
   }.value
 
