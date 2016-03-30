@@ -103,7 +103,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     for {
       token <- OptionT(authCodeDAO.find(code))
       user <- OptionT(gatewayUsers.byId(token.userId))
-    } yield AuthInfo(user, token.clientId, token.scope, token.redirectUri)
+    } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 
   override def deleteAuthCode(code: String): Future[Unit] = authCodeDAO.delete(code).map(_ => ())

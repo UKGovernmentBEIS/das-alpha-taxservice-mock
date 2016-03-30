@@ -1,4 +1,4 @@
-@(empref: String, clientId: String, redirectUri: String)
+@(empref: String, clientId: String, redirectUri: String, state:Option[String])
 
 @proposition = {
     <div class="header-proposition">
@@ -49,7 +49,7 @@
                 <p>Submit any information on behalf of the payroll scheme</p>
             </div>
             <p/>
-            <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri)">
+            <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri, state)">
                 Allow access
             </a>
             <a class="button" href="@controllers.gateway.routes.ClaimAuthController.deny(redirectUri)">Do not allow access</a>

@@ -1,20 +1,21 @@
 package controllers.gateway
 
 import java.security.SecureRandom
+import javax.inject.{Inject, Singleton}
 
 import actions.gateway.GatewayUserAction
-import javax.inject.{Singleton, Inject}
 import db.outh2.AuthCodeDAO
 import org.apache.commons.codec.binary.Hex
 import play.api.mvc.{Action, Controller}
+import views.html.helper
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec:ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec: ExecutionContext) extends Controller {
 
-  def auth(empref: String, clientId: String, redirectUri: String) = UserAction { implicit request =>
-    Ok(views.html.gateway.claim(empref, clientId, redirectUri))
+  def auth(empref: String, clientId: String, redirectUri: String, state: Option[String]) = UserAction { implicit request =>
+    Ok(views.html.gateway.claim(empref, clientId, redirectUri, state))
   }
 
   private val random = new SecureRandom()
@@ -26,10 +27,16 @@ class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: 
     new String(Hex.encodeHex(bytes))
   }
 
-  def confirm(empref: String, clientId: String, redirectUri: String) = UserAction.async { implicit request =>
+  def confirm(empref: String, clientId: String, redirectUri: String, state: Option[String]) = UserAction.async { implicit request =>
     val authCode = generateToken
-    authCodeDAO.create(authCode, request.user.id, clientId, empref).map { _ =>
-      Redirect(s"$redirectUri?code=$authCode").removingFromSession(UserAction.sessionKey)
+
+    authCodeDAO.create(authCode, request.user.id, redirectUri, clientId, empref).map { _ =>
+      val url = state match {
+        case Some(s) => s"$redirectUri?code=$authCode&state=${helper.urlEncode(s)}"
+        case None => s"$redirectUri?code=$authCode"
+      }
+
+      Redirect(url).removingFromSession(UserAction.sessionKey)
     }
   }
 

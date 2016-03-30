@@ -8,7 +8,7 @@ import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthCodeRow(authorizationCode: String, userId: Long, redirectUri: Option[String], createdAt: Date, scope: Option[String], clientId: Option[String], expiresIn: Int)
+case class AuthCodeRow(authorizationCode: String, userId: Long, redirectUri: String, createdAt: Date, scope: Option[String], clientId: Option[String], expiresIn: Int)
 
 trait AuthCodeModule extends DBModule {
 
@@ -18,8 +18,8 @@ trait AuthCodeModule extends DBModule {
 
   def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
 
-  def create(code: String, gatewayUserId: Long, clientId: String, empref:String): Future[Int] = {
-    val r = AuthCodeRow(code, gatewayUserId, None, new Date(System.currentTimeMillis()), Some(empref), Some(clientId), 100000)
+  def create(code: String, gatewayUserId: Long, redirectUri: String, clientId: String, empref: String): Future[Int] = {
+    val r = AuthCodeRow(code, gatewayUserId, redirectUri, new Date(System.currentTimeMillis()), Some(empref), Some(clientId), 100000)
     db.run(AuthCodes += r)
   }
 
@@ -30,7 +30,7 @@ trait AuthCodeModule extends DBModule {
 
     def userId = column[Long]("gateway_user_id")
 
-    def redirectUri = column[Option[String]]("redirect_uri")
+    def redirectUri = column[String]("redirect_uri")
 
     def createdAt = column[Date]("created_at")
 
