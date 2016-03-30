@@ -12,10 +12,10 @@ POST        /gateway/sign-in                 controllers.gateway.GatewaySignInCo
 GET         /gateway/sign-out                controllers.gateway.GatewaySignInController.signOut
 
 POST        /oauth/token                     controllers.security.OAuth2Controller.accessToken
-GET         /oauth/authorize                 controllers.gateway.ClaimAuthController.auth(scope:Option[String], clientId:String, redirectURI :String, state:Option[String])
+GET         /oauth/authorize                 controllers.gateway.ClaimAuthController.auth(scope:Option[String], client_id:String, redirect_uri :String, state:Option[String])
 
-GET         /oauth/confirm                   controllers.gateway.ClaimAuthController.confirm(empref:String, clientId:String, redirectURI :String, state:Option[String])
-GET         /oauth/deny                      controllers.gateway.ClaimAuthController.deny(redirectURI :String)
+GET         /oauth/confirm                   controllers.gateway.ClaimAuthController.confirm(empref:String, client_id:String, redirect_uri :String, state:Option[String])
+GET         /oauth/deny                      controllers.gateway.ClaimAuthController.deny(redirect_uri :String)
 
 GET         /admin                           controllers.admin.AdminController.index()
 GET         /admin/applications              controllers.admin.AdminController.applications()
