@@ -17,8 +17,8 @@ class GatewaySignInController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActi
 
   val userForm = Form(
     mapping(
-      "userId" -> text,
-      "password" -> text
+      "userId" -> nonEmptyText,
+      "password" -> nonEmptyText
     )(UserData.apply)(UserData.unapply)
   )
 

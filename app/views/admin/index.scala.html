@@ -1,0 +1,10 @@
+@()
+
+@adminmain("Tax Service Admin") {
+    <div>
+        <a href="@controllers.admin.routes.AdminController.applications()">Manage Applications</a>
+    </div>
+    <form method="post" action="@controllers.admin.routes.AdminController.addApplication()">
+
+    </form>
+}
