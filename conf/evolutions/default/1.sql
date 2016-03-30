@@ -43,7 +43,7 @@ VALUES ('client1', 'secret1', '', '', 'authorization_code');
 CREATE TABLE "auth_codes" (
   "authorization_code" VARCHAR NOT NULL PRIMARY KEY,
   "gateway_user_id"    INTEGER NOT NULL REFERENCES "gateway_user",
-  "redirect_uri"       VARCHAR NULL,
+  "redirect_uri"       VARCHAR NOT NULL,
   "created_at"         DATE    NOT NULL,
   "scope"              VARCHAR NULL,
   "client_id"          VARCHAR NOT NULL,

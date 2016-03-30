@@ -14,8 +14,11 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec: ExecutionContext) extends Controller {
 
-  def auth(empref: String, clientId: String, redirectUri: String, state: Option[String]) = UserAction { implicit request =>
-    Ok(views.html.gateway.claim(empref, clientId, redirectUri, state))
+  def auth(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = UserAction { implicit request =>
+    scope match {
+      case Some(empref) => Ok(views.html.gateway.claim(empref, clientId, redirectUri, state))
+      case None => BadRequest("missing scope")
+    }
   }
 
   private val random = new SecureRandom()
