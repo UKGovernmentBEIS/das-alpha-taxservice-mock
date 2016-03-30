@@ -7,7 +7,7 @@ import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthCodeRow(authorizationCode: String, userId: Long, redirectUri: String, createdAt: Long, scope: Option[String], clientId: Option[String], expiresIn: Int)
+case class AuthCodeRow(authorizationCode: String, gatewayId: String, redirectUri: String, createdAt: Long, scope: Option[String], clientId: Option[String], expiresIn: Int)
 
 trait AuthCodeModule extends DBModule {
 
@@ -18,7 +18,7 @@ trait AuthCodeModule extends DBModule {
   class AuthCodeTable(tag: Tag) extends Table[AuthCodeRow](tag, "auth_codes") {
     def authorizationCode = column[String]("authorization_code", O.PrimaryKey)
 
-    def userId = column[Long]("gateway_user_id")
+    def gatewayId = column[String]("gateway_id")
 
     def redirectUri = column[String]("redirect_uri")
 
@@ -30,7 +30,7 @@ trait AuthCodeModule extends DBModule {
 
     def expiresIn = column[Int]("expires_in")
 
-    def * = (authorizationCode, userId, redirectUri, createdAt, scope, clientId, expiresIn) <>(AuthCodeRow.tupled, AuthCodeRow.unapply)
+    def * = (authorizationCode, gatewayId, redirectUri, createdAt, scope, clientId, expiresIn) <>(AuthCodeRow.tupled, AuthCodeRow.unapply)
   }
 
 }
@@ -43,7 +43,7 @@ class AuthCodeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
 
-  def create(code: String, gatewayUserId: Long, redirectUri: String, clientId: String, empref: String): Future[Int] = {
+  def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, empref: String): Future[Int] = {
     val r = AuthCodeRow(code, gatewayUserId, redirectUri, System.currentTimeMillis(), Some(empref), Some(clientId), 100000)
     db.run(AuthCodes += r)
   }

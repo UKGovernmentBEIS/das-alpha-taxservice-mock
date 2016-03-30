@@ -10,7 +10,8 @@ import scala.concurrent.{ExecutionContext, Future}
 case class AccessTokenRow(
                            accessToken: String,
                            refreshToken: Option[String],
-                           userId: Long, scope: Option[String],
+                           gatewayId: String,
+                           scope: Option[String],
                            expiresIn: Option[Long],
                            createdAt: Long,
                            clientId: String)
@@ -29,7 +30,7 @@ trait AccessTokenModule extends DBModule {
 
     def refreshToken = column[Option[String]]("refresh_token")
 
-    def userId = column[Long]("gateway_user_id")
+    def gatewayId = column[String]("gateway_id")
 
     def scope = column[Option[String]]("scope")
 
@@ -39,7 +40,7 @@ trait AccessTokenModule extends DBModule {
 
     def clientId = column[String]("client_id")
 
-    def * = (accessToken, refreshToken, userId, scope, expiresIn, createdAt, clientId) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
+    def * = (accessToken, refreshToken, gatewayId, scope, expiresIn, createdAt, clientId) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 
   }
 
@@ -53,13 +54,13 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     AccessTokens.filter(_.refreshToken === refreshToken).result.headOption
   }
 
-  def find(userId: Long, clientId: Option[String]): Future[Option[AccessTokenRow]] = db.run {
-    AccessTokens.filter(at => at.userId === userId && at.clientId == clientId).result.headOption
+  def find(gatewayId: String, clientId: Option[String]): Future[Option[AccessTokenRow]] = db.run {
+    AccessTokens.filter(at => at.gatewayId === gatewayId && at.clientId == clientId).result.headOption
   }
 
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
-      _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.userId === token.userId).delete
+      _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.gatewayId === token.gatewayId).delete
       a <- AccessTokens += token
     } yield a.result
   }

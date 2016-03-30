@@ -1,7 +1,7 @@
 package actions.gateway
 
 import com.google.inject.Inject
-import db.gateway.{GatewayUserDAO, GatewayUserRow}
+import db.gateway.{GatewayIdDAO, GatewayIdRow}
 import play.api.mvc.Results._
 import play.api.mvc._
 
@@ -9,9 +9,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 
-class GatewayUserRequest[A](val request: Request[A], val user: GatewayUserRow) extends WrappedRequest[A](request)
+class GatewayUserRequest[A](val request: Request[A], val user: GatewayIdRow) extends WrappedRequest[A](request)
 
-class GatewayUserAction @Inject()(gatewayUsers: GatewayUserDAO)(implicit ec: ExecutionContext)
+class GatewayUserAction @Inject()(gatewayUsers: GatewayIdDAO)(implicit ec: ExecutionContext)
   extends ActionBuilder[GatewayUserRequest]
     with ActionRefiner[Request, GatewayUserRequest] {
 
@@ -25,11 +25,10 @@ class GatewayUserAction @Inject()(gatewayUsers: GatewayUserDAO)(implicit ec: Exe
 
     request.session.get(sessionKey) match {
       case None => Future.successful(redirectToSignIn)
-      case Some(ParseLong(id)) => gatewayUsers.byId(id).map {
+      case Some(id) => gatewayUsers.byId(id).map {
         case Some(u) => Right(new GatewayUserRequest(request, u))
         case None => redirectToSignIn
       }
-      case Some(s) => Future.successful(redirectToSignIn)
     }
   }
 }

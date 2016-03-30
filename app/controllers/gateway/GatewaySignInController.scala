@@ -3,7 +3,7 @@ package controllers.gateway
 import javax.inject.{Singleton, Inject}
 
 import actions.gateway.GatewayUserAction
-import db.gateway.GatewayUserDAO
+import db.gateway.GatewayIdDAO
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class UserData(userId: String, password: String)
 
 @Singleton
-class GatewaySignInController @Inject()(gatewayUserDAO: GatewayUserDAO, UserAction: GatewayUserAction)(implicit exec: ExecutionContext) extends Controller {
+class GatewaySignInController @Inject()(gatewayUserDAO: GatewayIdDAO, UserAction: GatewayUserAction)(implicit exec: ExecutionContext) extends Controller {
 
   val userForm = Form(
     mapping(

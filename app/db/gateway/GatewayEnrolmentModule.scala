@@ -5,27 +5,27 @@ import javax.inject.{Inject, Singleton}
 import db.{DBModule, SchemeModule}
 import play.api.db.slick.DatabaseConfigProvider
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-case class GatewayEnrolmentRow(gatewayUserId: Long, empref: String)
+case class GatewayEnrolmentRow(gatewayId: String, empref: String)
 
 trait GatewayEnrolmentModule extends DBModule {
-  self: GatewayUserModule with SchemeModule =>
+  self: GatewayIdModule with SchemeModule =>
 
   import driver.api._
 
   val GatewayEnrolments = TableQuery[GatewayEnrolmentTable]
 
   class GatewayEnrolmentTable(tag: Tag) extends Table[GatewayEnrolmentRow](tag, "gateway_enrolment") {
-    def gatewayUserId = column[Long]("gateway_user_id")
+    def gatewayId = column[String]("gateway_id")
 
-    def gatewayUserFk = foreignKey("enrolment_user", gatewayUserId, GatewayUsers)(_.id, onDelete = ForeignKeyAction.Cascade)
+    def gatewayIdFk = foreignKey("enrolment_user", gatewayId, GatewayIds)(_.id, onDelete = ForeignKeyAction.Cascade)
 
     def empref = column[String]("empref")
 
     def schemeFk = foreignKey("enrolment_scheme", empref, Schemes)(_.empref, onDelete = ForeignKeyAction.Cascade)
 
-    def * = (gatewayUserId, empref) <>(GatewayEnrolmentRow.tupled, GatewayEnrolmentRow.unapply)
+    def * = (gatewayId, empref) <>(GatewayEnrolmentRow.tupled, GatewayEnrolmentRow.unapply)
   }
 
 }
@@ -33,5 +33,11 @@ trait GatewayEnrolmentModule extends DBModule {
 @Singleton
 class GatewayEnrolmentDAO @Inject()()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
   extends GatewayEnrolmentModule
-    with GatewayUserModule
-    with SchemeModule
+    with GatewayIdModule
+    with SchemeModule {
+  import driver.api._
+
+  def enrolledSchemes(gatewayId:String) : Future[Seq[String]] = db.run {
+    GatewayEnrolments.filter(_.gatewayId === gatewayId).map(_.empref).result
+  }
+}
