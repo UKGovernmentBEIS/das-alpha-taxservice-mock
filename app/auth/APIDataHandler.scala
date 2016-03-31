@@ -69,7 +69,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
       val json = Json.toJson(token)
       Logger.info(Json.prettyPrint(json))
 
-      ws.url(s"$apiServerEndpointUri/provide-token").put(json).map(_ => ())
+      ws.url(s"$apiHost/auth/provide-token").put(json).map(_ => ())
     }
   }
 

@@ -6,6 +6,5 @@ import play.api.Configuration
 
 @Singleton
 class ServiceConfig @Inject()(config:Configuration){
-  val apiServerEndpointUri = config.getString("api.baseURI").get
-
+  val apiHost = config.getString("api.host").get
 }
