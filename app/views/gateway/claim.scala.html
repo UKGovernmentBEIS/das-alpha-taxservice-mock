@@ -1,4 +1,4 @@
-@(empref: String, clientId: String, redirectUri: String, state:Option[String])
+@(scope: String, clientId: String, redirectUri: String, state:Option[String])
 
 @proposition = {
     <div class="header-proposition">
@@ -15,31 +15,25 @@
     </div>
 }
 
-@main(s"Claiming empref $empref", insideHeader = proposition) {
+@main(s"Confirm Authorization", insideHeader = proposition) {
     <div>
         <article class="content__body">
-            <h2>The Digital Apprenticeship Service would like to access information about your PAYE scheme with Employer Reference @empref</h2>
+            <h2>The Digital Apprenticeship Service would like to access information about your PAYE schemes</h2>
             <div class="panel-indent">
                 <h2>
-                    The application
-                    <em>will</em>
-                    be able to:
+                    The application <em>will</em> be able to:
                 </h2>
-                <p>See details of levy declarations made against this payroll scheme</p>
-                <p>See the termination date of the payroll scheme (if any)</p>
+                <p>Read information relating to payroll schemes you are enrolled in</p>
             </div>
             <p/>
             <div class="panel-indent">
                 <h2>
-                    The application
-                    <em>will not</em>
-                    be able to:
+                    The application <em>will not</em> be able to:
                 </h2>
-                <p>See any other information about the payroll scheme</p>
-                <p>Submit any information on behalf of the payroll scheme</p>
+                <p>Submit any information on behalf of the payroll schemes you are enrolled in</p>
             </div>
             <p/>
-            <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(empref, clientId, redirectUri, state)">
+            <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(scope, clientId, redirectUri, state)">
                 Allow access
             </a>
             <a class="button" href="@controllers.gateway.routes.ClaimAuthController.deny(redirectUri)">Do not allow access</a>

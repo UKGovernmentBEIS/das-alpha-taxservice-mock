@@ -43,8 +43,8 @@ class AuthCodeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
 
-  def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, empref: String): Future[Int] = {
-    val r = AuthCodeRow(code, gatewayUserId, redirectUri, System.currentTimeMillis(), Some(empref), Some(clientId), 100000)
+  def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, scope: String): Future[Int] = {
+    val r = AuthCodeRow(code, gatewayUserId, redirectUri, System.currentTimeMillis(), Some(scope), Some(clientId), 100000)
     db.run(AuthCodes += r)
   }
 }

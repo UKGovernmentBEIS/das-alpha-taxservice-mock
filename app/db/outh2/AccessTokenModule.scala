@@ -3,6 +3,7 @@ package db.outh2
 import javax.inject.Inject
 
 import db.DBModule
+import db.gateway.GatewayIdModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,6 +18,7 @@ case class AccessTokenRow(
                            clientId: String)
 
 trait AccessTokenModule extends DBModule {
+  self: GatewayIdModule =>
 
   import driver.api._
 
@@ -32,6 +34,8 @@ trait AccessTokenModule extends DBModule {
 
     def gatewayId = column[String]("gateway_id")
 
+    def gatewayIdFk = foreignKey("token_gateway_id_fk", gatewayId, GatewayIds)(_.id, onDelete = ForeignKeyAction.Cascade)
+
     def scope = column[Option[String]]("scope")
 
     def expiresIn = column[Option[Long]]("expires_in")
@@ -46,7 +50,8 @@ trait AccessTokenModule extends DBModule {
 
 }
 
-class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AccessTokenModule {
+class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
+  extends AccessTokenModule with GatewayIdModule {
 
   import driver.api._
 

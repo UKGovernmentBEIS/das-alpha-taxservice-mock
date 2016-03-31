@@ -12,11 +12,14 @@ import views.html.helper
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec: ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec: ExecutionContext) extends Controller {
 
-  def auth(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = UserAction { implicit request =>
+  /**
+    * Handle the initial oAuth request
+    */
+  def auth(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = GatewayAction { implicit request =>
     scope match {
-      case Some(empref) => Ok(views.html.gateway.claim(empref, clientId, redirectUri, state))
+      case Some(s) => Ok(views.html.gateway.claim(s, clientId, redirectUri, state))
       case None => BadRequest("missing scope")
     }
   }
@@ -30,21 +33,21 @@ class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: 
     new String(Hex.encodeHex(bytes))
   }
 
-  def confirm(empref: String, clientId: String, redirectUri: String, state: Option[String]) = UserAction.async { implicit request =>
+  def confirm(scope: String, clientId: String, redirectUri: String, state: Option[String]) = GatewayAction.async { implicit request =>
     val authCode = generateToken
 
-    authCodeDAO.create(authCode, request.user.id, redirectUri, clientId, empref).map { _ =>
+    authCodeDAO.create(authCode, request.ggId.id, redirectUri, clientId, scope).map { _ =>
       val url = state match {
         case Some(s) => s"$redirectUri?code=$authCode&state=${helper.urlEncode(s)}"
         case None => s"$redirectUri?code=$authCode"
       }
 
-      Redirect(url).removingFromSession(UserAction.sessionKey)
+      Redirect(url).removingFromSession(GatewayAction.sessionKey)
     }
   }
 
   def deny(redirectUri: String) = Action { implicit r =>
-    Redirect(redirectUri).removingFromSession(UserAction.sessionKey)
+    Redirect(redirectUri).removingFromSession(GatewayAction.sessionKey)
   }
 
 }

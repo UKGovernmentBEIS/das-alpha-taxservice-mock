@@ -18,11 +18,11 @@ trait SchemeModule extends DBModule {
 
   def insert(cat: SchemeRow): Future[Unit] = db.run(Schemes += cat).map { _ => () }
 
-  class SchemeTable(tag: Tag) extends Table[SchemeRow](tag, "SCHEME") {
+  class SchemeTable(tag: Tag) extends Table[SchemeRow](tag, "scheme") {
 
-    def empref = column[String]("EMPREF", O.PrimaryKey)
+    def empref = column[String]("empref", O.PrimaryKey)
 
-    def terminationDate = column[Option[Date]]("TERMINATION_DATE")
+    def terminationDate = column[Option[Date]]("termination_date")
 
 
     def * = (empref, terminationDate) <>(SchemeRow.tupled, SchemeRow.unapply)
