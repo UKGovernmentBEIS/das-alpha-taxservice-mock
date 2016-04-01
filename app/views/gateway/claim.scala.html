@@ -18,19 +18,20 @@
 @main(s"Confirm Authorization", insideHeader = proposition) {
     <div>
         <article class="content__body">
-            <h2>The Digital Apprenticeship Service would like to access information about your PAYE schemes</h2>
+            <h2>The Digital Apprenticeship Service would like to access information about your Apprenticeship Levy Declarations</h2>
             <div class="panel-indent">
                 <h2>
                     The application <em>will</em> be able to:
                 </h2>
-                <p>Read information relating to payroll schemes you are enrolled in</p>
+                <p>Read information relating to levy declarations for payroll schemes you are enrolled in</p>
             </div>
             <p/>
             <div class="panel-indent">
                 <h2>
                     The application <em>will not</em> be able to:
                 </h2>
-                <p>Submit any information on behalf of the payroll schemes you are enrolled in</p>
+                <p>Read any other information relating to your payroll schemes</p>
+                <p>Submit any information on behalf of your payroll schemes</p>
             </div>
             <p/>
             <a class="button" href="@controllers.gateway.routes.ClaimAuthController.confirm(scope, clientId, redirectUri, state)">
