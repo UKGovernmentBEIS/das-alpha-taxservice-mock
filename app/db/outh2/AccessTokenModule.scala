@@ -63,6 +63,8 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     AccessTokens.filter(at => at.gatewayId === gatewayId && at.clientId == clientId).result.headOption
   }
 
+  def create(token: AccessTokenRow): Future[Unit] = db.run(AccessTokens += token).map(_ => ())
+
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
       _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.gatewayId === token.gatewayId).delete

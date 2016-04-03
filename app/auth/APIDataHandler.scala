@@ -54,7 +54,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.id, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
 
     for {
-      _ <- accessTokens.deleteExistingAndCreate(tokenRow)
+      _ <- accessTokens.create(tokenRow)
       _ <- sendTokenToApiServer(tokenRow)
     } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
   }
