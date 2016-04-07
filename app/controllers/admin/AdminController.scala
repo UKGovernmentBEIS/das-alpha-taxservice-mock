@@ -7,7 +7,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 case class AddAppFormData(id: String, secret: String)
 
