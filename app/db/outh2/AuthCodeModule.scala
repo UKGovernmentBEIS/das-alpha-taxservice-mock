@@ -2,6 +2,7 @@ package db.outh2
 
 import javax.inject.Inject
 
+import com.google.inject.ImplementedBy
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -35,7 +36,17 @@ trait AuthCodeModule extends DBModule {
 
 }
 
-class AuthCodeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AuthCodeModule {
+@ImplementedBy(classOf[AuthCodeDAO])
+trait AuthCodeOps {
+  def find(code: String): Future[Option[AuthCodeRow]]
+
+  def delete(code: String): Future[Int]
+
+  def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, scope: String): Future[Int]
+}
+
+class AuthCodeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
+  extends AuthCodeModule with AuthCodeOps {
 
   import driver.api._
 

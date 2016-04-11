@@ -4,7 +4,7 @@ import java.security.SecureRandom
 import javax.inject.{Inject, Singleton}
 
 import actions.gateway.GatewayUserAction
-import db.outh2.AuthCodeDAO
+import db.outh2.AuthCodeOps
 import org.apache.commons.codec.binary.Hex
 import play.api.mvc.{Action, Controller}
 import views.html.helper
@@ -12,7 +12,7 @@ import views.html.helper
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec: ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDAO: AuthCodeOps)(implicit ec: ExecutionContext) extends Controller {
 
   /**
     * Handle the initial oAuth request

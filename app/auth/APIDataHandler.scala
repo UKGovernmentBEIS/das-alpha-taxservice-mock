@@ -26,7 +26,7 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
+class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodeDAO: AuthCodeOps, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
 
   import config._
 
@@ -85,6 +85,10 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
           _ <- accessTokens.deleteExistingAndCreate(updatedRow)
           _ <- sendTokenToApiServer(updatedRow)
         } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
+      case None =>
+        val s = s"Cannot find an access token entry with refresh token $refreshToken"
+        Logger.warn(s)
+        throw new IllegalArgumentException(s)
     }
   }
 

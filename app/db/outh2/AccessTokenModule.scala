@@ -2,6 +2,7 @@ package db.outh2
 
 import javax.inject.Inject
 
+import com.google.inject.ImplementedBy
 import db.DBModule
 import db.gateway.GatewayIdModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -50,8 +51,19 @@ trait AccessTokenModule extends DBModule {
 
 }
 
+@ImplementedBy(classOf[AccessTokenDAO])
+trait AccessTokenOps {
+  def forRefreshToken(refreshToken: String): Future[Option[AccessTokenRow]]
+
+  def find(gatewayId: String, clientId: Option[String]): Future[Option[AccessTokenRow]]
+
+  def create(token: AccessTokenRow): Future[Unit]
+
+  def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit]
+}
+
 class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
-  extends AccessTokenModule with GatewayIdModule {
+  extends AccessTokenModule with AccessTokenOps with GatewayIdModule {
 
   import driver.api._
 
@@ -67,7 +79,7 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
-      _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.gatewayId === token.gatewayId).delete
+      _ <- AccessTokens.filter(a => a.refreshToken === token.refreshToken && a.clientId === token.clientId && a.gatewayId === token.gatewayId).delete
       a <- AccessTokens += token
     } yield a.result
   }
