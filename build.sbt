@@ -1,8 +1,10 @@
 name := "das-alpha-taxservice-mock"
 
-version := "1.0-SNAPSHOT"
-
 enablePlugins(PlayScala)
+enablePlugins(GitVersioning)
+enablePlugins(GitBranchPrompt)
+
+git.useGitDescribe := true
 
 scalaVersion := "2.11.8"
 
