@@ -1,4 +1,4 @@
-package db.outh2
+package db.oauth2
 
 import javax.inject.Inject
 

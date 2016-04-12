@@ -8,7 +8,7 @@ import cats.data.OptionT
 import cats.std.future._
 import config.ServiceConfig
 import db.gateway.{GatewayEnrolmentDAO, GatewayIdDAO, GatewayIdRow}
-import db.outh2._
+import db.oauth2._
 import org.apache.commons.codec.binary.Hex
 import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
@@ -66,10 +66,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     enrolments.enrolledSchemes(t.gatewayId).flatMap { emprefs =>
       val token = Token(t.accessToken, t.scope.get, t.gatewayId, emprefs.toList, t.clientId, expiresAt.getMillis)
 
-      val json = Json.toJson(token)
-      Logger.info(Json.prettyPrint(json))
-
-      ws.url(s"$apiHost/auth/provide-token").put(json).map(_ => ())
+      ws.url(s"$apiHost/auth/provide-token").put(Json.toJson(token)).map(_ => ())
     }
   }
 

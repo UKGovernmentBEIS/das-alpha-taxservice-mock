@@ -2,7 +2,7 @@ package controllers.admin
 
 import javax.inject.{Inject, Singleton}
 
-import db.outh2.{ClientDAO, ClientRow}
+import db.oauth2.{ClientDAO, ClientRow}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
