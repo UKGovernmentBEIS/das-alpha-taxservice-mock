@@ -66,7 +66,12 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     enrolments.enrolledSchemes(t.gatewayId).flatMap { emprefs =>
       val token = Token(t.accessToken, t.scope.get, t.gatewayId, emprefs.toList, t.clientId, expiresAt.getMillis)
 
-      ws.url(s"$apiHost/auth/provide-token").put(Json.toJson(token)).map(_ => ())
+      ws.url(s"$apiHost/auth/provide-token").put(Json.toJson(token)).map { response =>
+        response.status match {
+          case s if s >= 200 && s <= 299 => ()
+          case s => throw new Exception(s"/auth/provide-token call resulted in status $s with body ${response.body}")
+        }
+      }
     }
   }
 
