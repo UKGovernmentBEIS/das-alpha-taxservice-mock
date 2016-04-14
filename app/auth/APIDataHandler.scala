@@ -43,15 +43,6 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     }
   }
 
-  private val random = new SecureRandom()
-  random.nextBytes(new Array[Byte](55))
-
-  def generateToken: String = {
-    val bytes = new Array[Byte](12)
-    random.nextBytes(bytes)
-    new String(Hex.encodeHex(bytes))
-  }
-
   override def createAccessToken(authInfo: AuthInfo[GatewayIdRow]): Future[AccessToken] = {
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val refreshToken = Some(generateToken)
