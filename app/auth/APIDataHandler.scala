@@ -106,6 +106,12 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     }
   }.value
 
+  override def findAccessToken(token: String): Future[Option[AccessToken]] = {
+    OptionT(accessTokens.forAccessToken(token)).map { token =>
+      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
+    }
+  }.value
+
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayIdRow]]] = {
     for {
       token <- OptionT(authCodeDAO.find(code))
@@ -115,15 +121,21 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
 
   override def deleteAuthCode(code: String): Future[Unit] = authCodeDAO.delete(code).map(_ => ())
 
-  override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayIdRow]]] = ???
+  override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayIdRow]]] = {
+    for {
+      token <- OptionT(accessTokens.forAccessToken(accessToken.token))
+      user <- OptionT(gatewayIds.byId(token.gatewayId))
+    } yield AuthInfo(user, Some(token.clientId), token.scope, None)
+  }.value
 
-  override def findAccessToken(token: String): Future[Option[AccessToken]] = ???
 
   override def findUser(request: AuthorizationRequest): Future[Option[GatewayIdRow]] = {
-    OptionT.fromOption(request.clientCredential).flatMap { cred =>
-      OptionT(gatewayIds.byId(cred.clientId)).filter { u =>
-        BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)
-      }
+    OptionT.fromOption(request.clientCredential).flatMap {
+      cred =>
+        OptionT(gatewayIds.byId(cred.clientId)).filter {
+          u =>
+            BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)
+        }
     }
   }.value
 }

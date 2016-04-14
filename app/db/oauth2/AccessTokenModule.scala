@@ -55,6 +55,8 @@ trait AccessTokenModule extends DBModule {
 trait AccessTokenOps {
   def forRefreshToken(refreshToken: String): Future[Option[AccessTokenRow]]
 
+  def forAccessToken(accessToken: String): Future[Option[AccessTokenRow]]
+
   def find(gatewayId: String, clientId: Option[String]): Future[Option[AccessTokenRow]]
 
   def create(token: AccessTokenRow): Future[Unit]
@@ -71,6 +73,10 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     AccessTokens.filter(_.refreshToken === refreshToken).result.headOption
   }
 
+  override def forAccessToken(accessToken: String): Future[Option[AccessTokenRow]] = db.run {
+    AccessTokens.filter(_.accessToken === accessToken).result.headOption
+  }
+
   def find(gatewayId: String, clientId: Option[String]): Future[Option[AccessTokenRow]] = db.run {
     AccessTokens.filter(at => at.gatewayId === gatewayId && at.clientId == clientId).result.headOption
   }
@@ -83,5 +89,6 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       a <- AccessTokens += token
     } yield a.result
   }
+
 
 }
