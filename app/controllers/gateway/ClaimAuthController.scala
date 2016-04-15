@@ -3,7 +3,7 @@ package controllers.gateway
 import javax.inject.{Inject, Singleton}
 
 import actions.gateway.GatewayUserAction
-import db.outh2.AuthCodeOps
+import db.oauth2.AuthCodeOps
 import play.api.mvc.{Action, Controller}
 import views.html.helper
 
