@@ -19,7 +19,13 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
 
-case class Token(value: String, scope: String, gatewayId: String, emprefs: List[String], clientId: String, expiresAt: Long)
+case class ServiceBinding(identifierType: String, taxId: String)
+
+object ServiceBinding {
+  implicit val formats = Json.format[ServiceBinding]
+}
+
+case class Token(value: String, scope: String, gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
 
 object Token {
   implicit val formats = Json.format[Token]
@@ -64,7 +70,8 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
     val expiresAt = new DateTime(t.createdAt).plusSeconds(expiresIn.toInt)
 
     enrolments.enrolledSchemes(t.gatewayId).flatMap { emprefs =>
-      val token = Token(t.accessToken, t.scope.get, t.gatewayId, emprefs.toList, t.clientId, expiresAt.getMillis)
+      val serviceBindings = emprefs.map(e => ServiceBinding("empref", e)).toList
+      val token = Token(t.accessToken, t.scope.get, t.gatewayId, serviceBindings, t.clientId, expiresAt.getMillis)
 
       ws.url(s"$apiHost/auth/provide-token").put(Json.toJson(token)).map { response =>
         response.status match {
