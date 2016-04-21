@@ -2,14 +2,14 @@ package db.gateway
 
 import javax.inject.{Inject, Singleton}
 
-import db.DBModule
+import db.SlickModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class GatewayIdRow(id: String, hashedPassword: String)
 
-trait GatewayIdModule extends DBModule {
+trait GatewayIdModule extends SlickModule {
 
   import driver.api._
 

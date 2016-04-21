@@ -3,7 +3,7 @@ package db.oauth2
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
-import db.DBModule
+import db.SlickModule
 import db.gateway.GatewayIdModule
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -18,7 +18,7 @@ case class AccessTokenRow(
                            createdAt: Long,
                            clientId: String)
 
-trait AccessTokenModule extends DBModule {
+trait AccessTokenModule extends SlickModule {
   self: GatewayIdModule =>
 
   import driver.api._

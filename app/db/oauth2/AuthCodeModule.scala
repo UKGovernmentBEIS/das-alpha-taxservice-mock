@@ -3,14 +3,14 @@ package db.oauth2
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
-import db.DBModule
+import db.SlickModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthCodeRow(authorizationCode: String, gatewayId: String, redirectUri: String, createdAt: Long, scope: Option[String], clientId: Option[String], expiresIn: Int)
 
-trait AuthCodeModule extends DBModule {
+trait AuthCodeModule extends SlickModule {
 
   import driver.api._
 

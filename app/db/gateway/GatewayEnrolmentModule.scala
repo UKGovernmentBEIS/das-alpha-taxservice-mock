@@ -1,15 +1,14 @@
 package db.gateway
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
-import db.{DBModule, SchemeModule}
-import play.api.db.slick.DatabaseConfigProvider
+import db.{SchemeModule, SlickModule}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class GatewayEnrolmentRow(gatewayId: String, empref: String)
 
-trait GatewayEnrolmentModule extends DBModule {
+trait GatewayEnrolmentModule extends SlickModule {
   self: GatewayIdModule with SchemeModule =>
 
   import driver.api._
@@ -30,14 +29,11 @@ trait GatewayEnrolmentModule extends DBModule {
 
 }
 
-@Singleton
-class GatewayEnrolmentDAO @Inject()()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
-  extends GatewayEnrolmentModule
-    with GatewayIdModule
-    with SchemeModule {
-  import driver.api._
+class GatewayEnrolmentDAO @Inject()(enrolments: GatewayEnrolmentModule)(implicit val ec: ExecutionContext) {
+  import enrolments._
+  import api._
 
-  def enrolledSchemes(gatewayId:String) : Future[Seq[String]] = db.run {
+  def enrolledSchemes(gatewayId: String): Future[Seq[String]] = run {
     GatewayEnrolments.filter(_.gatewayId === gatewayId).map(_.empref).result
   }
 }
