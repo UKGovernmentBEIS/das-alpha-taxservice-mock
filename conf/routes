@@ -14,9 +14,6 @@ GET         /gateway/sign-out                controllers.gateway.GatewaySignInCo
 POST        /oauth/token                     controllers.security.OAuth2Controller.accessToken
 GET         /oauth/authorize                 controllers.gateway.ClaimAuthController.authorize(scope:Option[String], client_id:String, redirect_uri :String, state:Option[String])
 
-GET         /oauth/confirm                   controllers.gateway.ClaimAuthController.confirm(empref:String, client_id:String, redirect_uri :String, state:Option[String])
-GET         /oauth/deny                      controllers.gateway.ClaimAuthController.deny(redirect_uri :String)
-
 GET         /admin                           controllers.admin.AdminController.index()
 GET         /admin/applications              controllers.admin.AdminController.applications()
 POST        /admin/add-application           controllers.admin.AdminController.addApplication()

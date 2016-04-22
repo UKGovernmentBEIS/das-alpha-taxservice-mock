@@ -2,12 +2,12 @@ package controllers.gateway
 
 import javax.inject.{Inject, Singleton}
 
-import actions.gateway.GatewayUserAction
+import actions.gateway.{GatewayIdRequest, GatewayUserAction}
 import db.oauth2.AuthCodeOps
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AnyContent, Controller}
 import views.html.helper
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDAO: AuthCodeOps)(implicit ec: ExecutionContext) extends Controller {
@@ -15,28 +15,24 @@ class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDA
   /**
     * Handle the initial oAuth request
     */
-  def authorize(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = GatewayAction { implicit request =>
+  def authorize(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = GatewayAction.async { implicit request =>
     scope match {
-      case Some(s) => Ok(views.html.gateway.claim(s, clientId, redirectUri, state))
-      case None => BadRequest("missing scope")
+      case Some(s) => createAuthCode(s, clientId, redirectUri, state, request).map { url =>
+        Redirect(url).removingFromSession(GatewayAction.sessionKey)
+      }
+      case None => Future.successful(BadRequest("missing scope"))
     }
   }
 
-  def confirm(scope: String, clientId: String, redirectUri: String, state: Option[String]) = GatewayAction.async { implicit request =>
+  def createAuthCode(scope: String, clientId: String, redirectUri: String, state: Option[String], request: GatewayIdRequest[AnyContent]): Future[String] = {
     val authCode = auth.generateToken
 
     authCodeDAO.create(authCode, request.ggId.id, redirectUri, clientId, scope).map { _ =>
-      val url = state match {
+      state match {
         case Some(s) => s"$redirectUri?code=$authCode&state=${helper.urlEncode(s)}"
         case None => s"$redirectUri?code=$authCode"
       }
-
-      Redirect(url).removingFromSession(GatewayAction.sessionKey)
     }
-  }
-
-  def deny(redirectUri: String) = Action { implicit r =>
-    Redirect(redirectUri).removingFromSession(GatewayAction.sessionKey)
   }
 
 }
