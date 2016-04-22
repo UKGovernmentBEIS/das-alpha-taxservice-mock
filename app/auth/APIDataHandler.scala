@@ -1,6 +1,5 @@
 package auth
 
-import java.security.SecureRandom
 import java.util.Date
 import javax.inject.{Inject, Singleton}
 
@@ -9,7 +8,6 @@ import cats.std.future._
 import config.ServiceConfig
 import db.gateway.{GatewayEnrolmentDAO, GatewayIdDAO, GatewayIdRow}
 import db.oauth2._
-import org.apache.commons.codec.binary.Hex
 import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
@@ -25,7 +23,7 @@ object ServiceBinding {
   implicit val formats = Json.format[ServiceBinding]
 }
 
-case class Token(value: String, scope: String, gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
+case class Token(value: String, scopes: List[String], gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
 
 object Token {
   implicit val formats = Json.format[Token]
@@ -62,7 +60,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
 
     enrolments.enrolledSchemes(t.gatewayId).flatMap { emprefs =>
       val serviceBindings = emprefs.map(e => ServiceBinding("empref", e)).toList
-      val token = Token(t.accessToken, t.scope.get, t.gatewayId, serviceBindings, t.clientId, expiresAt.getMillis)
+      val token = Token(t.accessToken, t.scope.get.split("\\s").toList, t.gatewayId, serviceBindings, t.clientId, expiresAt.getMillis)
 
       ws.url(s"$apiHost/auth/provide-token").put(Json.toJson(token)).map { response =>
         response.status match {
