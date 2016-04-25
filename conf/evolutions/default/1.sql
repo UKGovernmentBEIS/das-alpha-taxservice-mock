@@ -32,6 +32,8 @@ VALUES ('gateway1', 'epaye', 'empref', '123/BC12345');
 INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
 VALUES ('gateway1', 'epaye', 'empref', '321/ZX54321');
 INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
+VALUES ('gateway1', 'ct', 'ctutr', '123456789');
+INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
 VALUES ('gateway2', 'epaye', 'empref', '222/MM22222');
 
 CREATE TABLE "client" (
