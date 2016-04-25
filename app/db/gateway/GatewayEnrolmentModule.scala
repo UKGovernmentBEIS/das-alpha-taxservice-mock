@@ -6,7 +6,7 @@ import db.{SchemeModule, SlickModule}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class GatewayEnrolmentRow(gatewayId: String, empref: String)
+case class GatewayEnrolmentRow(gatewayId: String, service: String, taxIdType: String, taxId: String)
 
 trait GatewayEnrolmentModule extends SlickModule {
   self: GatewayIdModule with SchemeModule =>
@@ -20,20 +20,25 @@ trait GatewayEnrolmentModule extends SlickModule {
 
     def gatewayIdFk = foreignKey("enrolment_user", gatewayId, GatewayIds)(_.id, onDelete = ForeignKeyAction.Cascade)
 
-    def empref = column[String]("empref")
+    def service = column[String]("service")
 
-    def schemeFk = foreignKey("enrolment_scheme", empref, Schemes)(_.empref, onDelete = ForeignKeyAction.Cascade)
+    def taxIdType = column[String]("tax_id_type")
 
-    def * = (gatewayId, empref) <>(GatewayEnrolmentRow.tupled, GatewayEnrolmentRow.unapply)
+    def taxId = column[String]("tax_id")
+
+    def * = (gatewayId, service, taxIdType, taxId) <>(GatewayEnrolmentRow.tupled, GatewayEnrolmentRow.unapply)
   }
 
 }
 
 class GatewayEnrolmentDAO @Inject()(enrolments: GatewayEnrolmentModule)(implicit val ec: ExecutionContext) {
+
   import enrolments._
   import api._
 
+  def find(gatewayId: String): Future[Seq[GatewayEnrolmentRow]] = run(GatewayEnrolments.filter(_.gatewayId === gatewayId).result)
+
   def enrolledSchemes(gatewayId: String): Future[Seq[String]] = run {
-    GatewayEnrolments.filter(_.gatewayId === gatewayId).map(_.empref).result
+    GatewayEnrolments.filter(ge => ge.gatewayId === gatewayId && ge.service === "epaye" && ge.taxIdType === "empref").map(_.taxId).result
   }
 }

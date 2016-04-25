@@ -16,17 +16,23 @@ CREATE TABLE "gateway_id" (
 );
 
 CREATE TABLE "gateway_enrolment" (
-  "gateway_id" VARCHAR NOT NULL REFERENCES "gateway_id",
-  "empref"     VARCHAR NOT NULL REFERENCES "scheme"
+  "gateway_id"  VARCHAR NOT NULL REFERENCES "gateway_id",
+  "service"     VARCHAR NOT NULL,
+  "tax_id_type" VARCHAR NOT NULL,
+  "tax_id"      VARCHAR NOT NULL
 );
 
 INSERT INTO "gateway_id" ("id", "password") VALUES ('gateway1', 'password');
 INSERT INTO "gateway_id" ("id", "password") VALUES ('gateway2', 'password');
 
-INSERT INTO "gateway_enrolment" ("gateway_id", "empref") VALUES ('gateway1', '123/AB12345');
-INSERT INTO "gateway_enrolment" ("gateway_id", "empref") VALUES ('gateway1', '123/BC12345');
-INSERT INTO "gateway_enrolment" ("gateway_id", "empref") VALUES ('gateway1', '321/ZX54321');
-INSERT INTO "gateway_enrolment" ("gateway_id", "empref") VALUES ('gateway2', '222/MM22222');
+INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
+VALUES ('gateway1', 'epaye', 'empref', '123/AB12345');
+INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
+VALUES ('gateway1', 'epaye', 'empref', '123/BC12345');
+INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
+VALUES ('gateway1', 'epaye', 'empref', '321/ZX54321');
+INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
+VALUES ('gateway2', 'epaye', 'empref', '222/MM22222');
 
 CREATE TABLE "client" (
   "id"           VARCHAR NOT NULL PRIMARY KEY,
