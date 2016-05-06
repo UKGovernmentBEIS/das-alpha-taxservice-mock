@@ -1,40 +1,42 @@
-@import uk.gov.bis.controllers.gateway.UserData
 @import play.api.data.Form
+@import uk.gov.bis.taxserviceMock.controllers.gateway
+@import uk.gov.bis.taxserviceMock.controllers.gateway.UserData
+
 @(form: Form[UserData])
 
-    @proposition = {
-        <div class="header-proposition">
-            <div class="content">
-                <nav id="proposition-menu" class="header__menu" role="navigation">
-                    <span class="header__menu__proposition-name">Business tax account</span>
-                </nav>
-            </div>
+@proposition = {
+    <div class="header-proposition">
+        <div class="content">
+            <nav id="proposition-menu" class="header__menu" role="navigation">
+                <span class="header__menu__proposition-name">Business tax account</span>
+            </nav>
         </div>
-    }
+    </div>
+}
 
-    @main("Login in to Government Gateway", insideHeader = proposition) {
-        <div>
-            <article class="content__body">
-                <h1>Sign in</h1>
-                <p>Enter your Government Gateway credentials to sign in. You received these when you created your HMRC online account.</p>
-                <form method="post" action="@uk.gov.bis.controllers.gateway.routes.GatewaySignInController.handleSignIn()">
-                    <div id="errors">
-                    @form.errors.map { e => <div>@e.messages.head</div> }
+@main("Login in to Government Gateway", insideHeader = proposition) {
+    <div>
+        <article class="content__body">
+            <h1>Sign in</h1>
+            <p>Enter your Government Gateway credentials to sign in. You received these when you created your HMRC online account.</p>
+            <form method="post" action="@gateway.routes.GatewaySignInController.handleSignIn()">
+                <div id="errors">
+                @form.errors.map { e => <div>@e.messages.head</div> }
+                </div>
+                <fieldset class="form-field-group">
+                    <div class="form-field">
+                        <label class="label--inline" for="userId">User ID</label>
+                        <input type="text" id="userId" name="userId" required />
                     </div>
-                    <fieldset class="form-field-group">
-                        <div class="form-field">
-                            <label class="label--inline" for="userId">User ID</label>
-                            <input type="text" id="userId" name="userId" required />
-                        </div>
-                        <div class="form-field">
-                            <label class="label--inline" for="password">Password</label>
-                            <input type="password" id="password" required name="password"/>
-                        </div>
-                        <div class="form-field">
-                            <input class="button" type="submit" value="Sign in"/>
-                        </div>
-                    </fieldset>
-                </form>
-            </article>
-        </div>
-    }
+                    <div class="form-field">
+                        <label class="label--inline" for="password">Password</label>
+                        <input type="password" id="password" required name="password"/>
+                    </div>
+                    <div class="form-field">
+                        <input class="button" type="submit" value="Sign in"/>
+                    </div>
+                </fieldset>
+            </form>
+        </article>
+    </div>
+}

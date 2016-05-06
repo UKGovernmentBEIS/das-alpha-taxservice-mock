@@ -1,4 +1,4 @@
-package uk.gov.bis.db
+package uk.gov.bis.taxserviceMock.db
 
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.driver.JdbcProfile

@@ -1,11 +1,11 @@
-package uk.gov.bis.controllers.gateway
+package uk.gov.bis.taxserviceMock.controllers.gateway
 
 import javax.inject.{Inject, Singleton}
 
 import play.api.mvc.{AnyContent, Controller}
-import uk.gov.bis.actions.gateway.{GatewayIdRequest, GatewayUserAction}
-import uk.gov.bis.controllers.auth.generateToken
-import uk.gov.bis.db.oauth2.AuthCodeOps
+import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayIdRequest, GatewayUserAction}
+import uk.gov.bis.taxserviceMock.controllers.auth.generateToken
+import uk.gov.bis.taxserviceMock.db.oauth2.AuthCodeOps
 import views.html.helper
 
 import scala.concurrent.{ExecutionContext, Future}

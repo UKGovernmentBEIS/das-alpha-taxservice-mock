@@ -1,8 +1,8 @@
-package uk.gov.bis.db.oauth2
+package uk.gov.bis.taxserviceMock.db.oauth2
 
 import javax.inject.Inject
 
-import uk.gov.bis.db.SlickModule
+import uk.gov.bis.taxserviceMock.db.SlickModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}

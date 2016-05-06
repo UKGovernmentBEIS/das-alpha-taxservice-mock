@@ -1,8 +1,8 @@
-package uk.gov.bis.db.gateway
+package uk.gov.bis.taxserviceMock.db.gateway
 
 import javax.inject.{Inject, Singleton}
 
-import uk.gov.bis.db.SlickModule
+import uk.gov.bis.taxserviceMock.db.SlickModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}

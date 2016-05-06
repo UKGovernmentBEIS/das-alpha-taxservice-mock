@@ -1,10 +1,11 @@
-@import uk.gov.bis.db.oauth2.ClientRow
-@import uk.gov.bis.controllers.admin.AddAppFormData
+@import uk.gov.bis.taxserviceMock.controllers.admin
+@import uk.gov.bis.taxserviceMock.controllers.admin._
+@import uk.gov.bis.taxserviceMock.db.oauth2.ClientRow
 
 @(form: Form[AddAppFormData], cs: Seq[ClientRow])
 
 @adminmain("Applications") {
-    <div><a href="@uk.gov.bis.controllers.admin.routes.AdminController.index()">back</a></div>
+    <div><a href="@routes.AdminController.index()">back</a></div>
     <br>
     <div>
         Here you can add and remove client credentials for applications. *PLEASE* don't mess with
@@ -25,7 +26,7 @@
                 <tr>
                     <td>@c.id</td>
                     <td>@c.secret</td>
-                    <td><a href="@uk.gov.bis.controllers.admin.routes.AdminController.removeApplication(c.id)">remove</a></td>
+                    <td><a href="@admin.routes.AdminController.removeApplication(c.id)">remove</a></td>
                 </tr>
             }
             </tbody>
@@ -33,18 +34,18 @@
     </div>
     <div>
         <br>
-        <form method="post" action="@uk.gov.bis.controllers.admin.routes.AdminController.addApplication()">
+        <form method="post" action="@admin.routes.AdminController.addApplication()">
             <fieldset>
                 <legend>Add credentials for an application:</legend>
                 <div>
                     @form.errors("clientId").map(_.message)
                     <label for="clientId">Client ID</label>
-                    <input type="text" name="clientId">
+                    <input label="clientId" type="text" name="clientId">
                 </div>
                 <div>
                     @form.errors("clientSecret").map(_.message)
                     <label for="clientSecret">Client Secret</label>
-                    <input type="text" name="clientSecret">
+                    <input label="clientSecret" type="text" name="clientSecret">
                 </div>
                 <input type="submit" value="Add"/>
             </fieldset>

@@ -1,10 +1,11 @@
+@import uk.gov.bis.taxserviceMock.controllers.admin
 @()
 
 @adminmain("Tax Service Admin") {
     <div>
-        <a href="@uk.gov.bis.controllers.admin.routes.AdminController.applications()">Manage Applications</a>
+        <a href="@admin.routes.AdminController.applications()">Manage Applications</a>
     </div>
-    <form method="post" action="@uk.gov.bis.controllers.admin.routes.AdminController.addApplication()">
+    <form method="post" action="@admin.routes.AdminController.addApplication()">
 
     </form>
 }

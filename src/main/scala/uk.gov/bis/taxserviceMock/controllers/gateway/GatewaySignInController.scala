@@ -1,13 +1,13 @@
-package uk.gov.bis.controllers.gateway
+package uk.gov.bis.taxserviceMock.controllers.gateway
 
 import javax.inject.{Inject, Singleton}
 
-import uk.gov.bis.db.gateway.GatewayIdDAO
+import uk.gov.bis.taxserviceMock.db.gateway.GatewayIdDAO
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
-import uk.gov.bis.actions.gateway.GatewayUserAction
-import uk.gov.bis.controllers.gateway._
+import uk.gov.bis.taxserviceMock.actions.gateway.GatewayUserAction
+import uk.gov.bis.taxserviceMock.controllers.gateway._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +35,7 @@ class GatewaySignInController @Inject()(gatewayUserDAO: GatewayIdDAO, UserAction
           case Some(user) =>
             request.session.get(UserAction.continueKey) match {
               case Some(uri) => Redirect(uri).removingFromSession(UserAction.continueKey).addingToSession((UserAction.sessionKey, user.id.toString))
-              case None => Redirect(uk.gov.bis.controllers.gateway.routes.ApplicationController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
+              case None => Redirect(routes.ApplicationController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
             }
           case None => Ok(views.html.gateway.signIn(userForm.withError("username", "Bad user name or password")))
         }
@@ -44,6 +44,6 @@ class GatewaySignInController @Inject()(gatewayUserDAO: GatewayIdDAO, UserAction
   }
 
   def signOut = Action {
-    Redirect(uk.gov.bis.controllers.gateway.routes.GatewaySignInController.showSignIn()).withNewSession
+    Redirect(routes.GatewaySignInController.showSignIn()).withNewSession
   }
 }

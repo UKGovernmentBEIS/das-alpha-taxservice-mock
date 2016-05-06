@@ -1,11 +1,12 @@
-package uk.gov.bis.controllers.admin
+package uk.gov.bis.taxserviceMock.controllers.admin
 
 import javax.inject.{Inject, Singleton}
 
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
-import uk.gov.bis.db.oauth2.{ClientDAO, ClientRow}
+import uk.gov.bis.taxserviceMock.db.oauth2.{ClientDAO, ClientRow}
+//import uk.gov.bis.taxserviceMock.controllers._
 
 import scala.concurrent.ExecutionContext
 
@@ -36,13 +37,13 @@ class AdminController @Inject()(clients: ClientDAO)(implicit ec: ExecutionContex
       data => {
         val row = new ClientRow(data.id, Some(data.secret), None, None)
         clients.addClient(row).map { _ =>
-          Redirect(uk.gov.bis.controllers.admin.routes.AdminController.applications())
+          Redirect(routes.AdminController.applications())
         }
       }
     )
   }
 
   def removeApplication(id: String) = Action.async { implicit request =>
-    clients.remove(id).map(_ => Redirect(uk.gov.bis.controllers.admin.routes.AdminController.applications()))
+    clients.remove(id).map(_ => Redirect(uk.gov.bis.taxserviceMock.controllers.admin.routes.AdminController.applications()))
   }
 }

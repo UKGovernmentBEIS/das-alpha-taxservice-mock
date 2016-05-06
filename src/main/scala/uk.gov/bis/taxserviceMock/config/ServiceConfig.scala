@@ -1,4 +1,4 @@
-package uk.gov.bis.config
+package uk.gov.bis.taxserviceMock.config
 
 import javax.inject.{Inject, Singleton}
 

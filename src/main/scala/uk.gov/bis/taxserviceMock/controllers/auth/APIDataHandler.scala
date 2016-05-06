@@ -1,4 +1,4 @@
-package uk.gov.bis.controllers.auth
+package uk.gov.bis.taxserviceMock.controllers.auth
 
 import java.util.Date
 import javax.inject.{Inject, Singleton}
@@ -10,9 +10,9 @@ import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import uk.gov.bis.config.ServiceConfig
-import uk.gov.bis.db.gateway.{GatewayEnrolmentDAO, GatewayIdDAO, GatewayIdRow}
-import uk.gov.bis.db.oauth2._
+import uk.gov.bis.taxserviceMock.config.ServiceConfig
+import uk.gov.bis.taxserviceMock.db.gateway.{GatewayEnrolmentDAO, GatewayIdDAO, GatewayIdRow}
+import uk.gov.bis.taxserviceMock.db.oauth2._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._

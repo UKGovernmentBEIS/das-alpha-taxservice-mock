@@ -1,9 +1,10 @@
-package uk.gov.bis.actions.gateway
+package uk.gov.bis.taxserviceMock.actions.gateway
 
 import com.google.inject.Inject
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.bis.db.gateway._
+import uk.gov.bis.taxserviceMock.controllers._
+import uk.gov.bis.taxserviceMock.db.gateway._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -20,7 +21,7 @@ class GatewayUserAction @Inject()(gatewayIds: GatewayIdDAO)(implicit ec: Executi
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, GatewayIdRequest[A]]] = {
     implicit val rh: RequestHeader = request
-    val redirectToSignIn = Left(Redirect(uk.gov.bis.controllers.gateway.routes.GatewaySignInController.showSignIn()).addingToSession(continueKey -> request.uri))
+    val redirectToSignIn = Left(Redirect(gateway.routes.GatewaySignInController.showSignIn()).addingToSession(continueKey -> request.uri))
 
     request.session.get(sessionKey) match {
       case None => Future.successful(redirectToSignIn)

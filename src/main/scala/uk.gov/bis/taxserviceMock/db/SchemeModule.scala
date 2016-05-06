@@ -1,4 +1,4 @@
-package uk.gov.bis.db
+package uk.gov.bis.taxserviceMock.db
 
 import java.sql.Date
 import javax.inject.{Inject, Singleton}

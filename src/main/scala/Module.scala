@@ -1,6 +1,6 @@
 import com.google.inject.AbstractModule
-import uk.gov.bis.db.gateway.GatewayEnrolmentModule
-import uk.gov.bis.playslicks.GatewayEnrolments
+import uk.gov.bis.taxserviceMock.db.gateway.GatewayEnrolmentModule
+import uk.gov.bis.taxserviceMock.playslicks.GatewayEnrolments
 
 class Module extends AbstractModule {
 
