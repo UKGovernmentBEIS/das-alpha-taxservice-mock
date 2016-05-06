@@ -1,6 +1,8 @@
 name := "das-alpha-taxservice-mock"
 
 enablePlugins(PlayScala)
+disablePlugins(PlayLayoutPlugin)
+
 enablePlugins(GitVersioning)
 enablePlugins(GitBranchPrompt)
 

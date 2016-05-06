@@ -1,0 +1,53 @@
+@import uk.gov.bis.db.oauth2.ClientRow
+@import uk.gov.bis.controllers.admin.AddAppFormData
+
+@(form: Form[AddAppFormData], cs: Seq[ClientRow])
+
+@adminmain("Applications") {
+    <div><a href="@uk.gov.bis.controllers.admin.routes.AdminController.index()">back</a></div>
+    <br>
+    <div>
+        Here you can add and remove client credentials for applications. *PLEASE* don't mess with
+        credentials other than your own!
+    </div>
+    <br>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Client Secret</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @cs.map { c =>
+                <tr>
+                    <td>@c.id</td>
+                    <td>@c.secret</td>
+                    <td><a href="@uk.gov.bis.controllers.admin.routes.AdminController.removeApplication(c.id)">remove</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <br>
+        <form method="post" action="@uk.gov.bis.controllers.admin.routes.AdminController.addApplication()">
+            <fieldset>
+                <legend>Add credentials for an application:</legend>
+                <div>
+                    @form.errors("clientId").map(_.message)
+                    <label for="clientId">Client ID</label>
+                    <input type="text" name="clientId">
+                </div>
+                <div>
+                    @form.errors("clientSecret").map(_.message)
+                    <label for="clientSecret">Client Secret</label>
+                    <input type="text" name="clientSecret">
+                </div>
+                <input type="submit" value="Add"/>
+            </fieldset>
+        </form>
+    </div>
+}
