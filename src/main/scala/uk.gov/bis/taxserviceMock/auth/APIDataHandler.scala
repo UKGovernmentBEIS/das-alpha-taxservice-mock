@@ -1,4 +1,4 @@
-package uk.gov.bis.taxserviceMock.controllers.auth
+package uk.gov.bis.taxserviceMock.auth
 
 import java.util.Date
 import javax.inject.{Inject, Singleton}
@@ -30,7 +30,8 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodeDAO: AuthCodeOps, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
+class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
+
   import config._
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
@@ -111,12 +112,12 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayIdRow]]] = {
     for {
-      token <- OptionT(authCodeDAO.find(code))
+      token <- OptionT(authCodes.find(code))
       user <- OptionT(gatewayIds.byId(token.gatewayId))
     } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 
-  override def deleteAuthCode(code: String): Future[Unit] = authCodeDAO.delete(code).map(_ => ())
+  override def deleteAuthCode(code: String): Future[Unit] = authCodes.delete(code).map(_ => ())
 
   override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayIdRow]]] = {
     for {

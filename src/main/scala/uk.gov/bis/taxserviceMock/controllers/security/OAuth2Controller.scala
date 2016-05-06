@@ -2,7 +2,7 @@ package uk.gov.bis.taxserviceMock.controllers.security
 
 import javax.inject.{Singleton, Inject}
 
-import uk.gov.bis.taxserviceMock.controllers.auth.APIDataHandler
+import uk.gov.bis.taxserviceMock.auth.APIDataHandler
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext

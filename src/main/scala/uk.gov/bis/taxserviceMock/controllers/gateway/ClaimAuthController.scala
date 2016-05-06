@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.mvc.{AnyContent, Controller}
 import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayIdRequest, GatewayUserAction}
-import uk.gov.bis.taxserviceMock.controllers.auth.generateToken
+import uk.gov.bis.taxserviceMock.auth.generateToken
 import uk.gov.bis.taxserviceMock.db.oauth2.AuthCodeOps
 import views.html.helper
 

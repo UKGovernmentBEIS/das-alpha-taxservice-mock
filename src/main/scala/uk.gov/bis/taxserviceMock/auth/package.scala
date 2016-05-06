@@ -1,4 +1,4 @@
-package uk.gov.bis.taxserviceMock.controllers
+package uk.gov.bis.taxserviceMock
 
 import java.security.SecureRandom
 
