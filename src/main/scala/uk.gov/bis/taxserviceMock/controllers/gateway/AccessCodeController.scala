@@ -16,7 +16,10 @@ class AccessCodeController @Inject()(UserAction: GatewayUserAction) extends Cont
     val r = for {
       userId <- request.session.get(UserAction.validatedUserKey)
       uri <- request.session.get(UserAction.continueKey)
-    } yield Redirect(uri).removingFromSession(UserAction.continueKey).addingToSession((UserAction.sessionKey, userId))
+    } yield Redirect(uri)
+      .removingFromSession(UserAction.continueKey)
+      .removingFromSession(UserAction.validatedUserKey)
+      .addingToSession((UserAction.sessionKey, userId))
 
     r.getOrElse(Unauthorized)
 
