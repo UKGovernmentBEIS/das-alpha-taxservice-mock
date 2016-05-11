@@ -32,11 +32,7 @@ class GatewaySignInController @Inject()(gatewayUserDAO: GatewayIdDAO, UserAction
       formWithErrors => Future.successful(BadRequest(views.html.gateway.signIn(formWithErrors))),
       userData => {
         gatewayUserDAO.validate(userData.userId, userData.password).map {
-          case Some(user) =>
-            request.session.get(UserAction.continueKey) match {
-              case Some(uri) => Redirect(uri).removingFromSession(UserAction.continueKey).addingToSession((UserAction.sessionKey, user.id.toString))
-              case None => Redirect(routes.ApplicationController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
-            }
+          case Some(user) => Redirect(routes.AccessCodeController.show()).addingToSession((UserAction.validatedUserKey, user.id.toString))
           case None => Ok(views.html.gateway.signIn(userForm.withError("username", "Bad user name or password")))
         }
       }

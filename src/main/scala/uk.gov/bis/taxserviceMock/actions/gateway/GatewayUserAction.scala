@@ -16,6 +16,7 @@ class GatewayUserAction @Inject()(gatewayIds: GatewayIdDAO)(implicit ec: Executi
     with ActionRefiner[Request, GatewayIdRequest] {
 
   val sessionKey = "mtdpId"
+  val validatedUserKey = "validatedUser"
 
   val continueKey = "continue"
 
