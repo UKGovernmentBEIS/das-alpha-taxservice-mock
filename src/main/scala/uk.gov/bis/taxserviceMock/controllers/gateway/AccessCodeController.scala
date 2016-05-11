@@ -7,7 +7,7 @@ import uk.gov.bis.taxserviceMock.actions.gateway.GatewayUserAction
 
 class AccessCodeController @Inject()(UserAction: GatewayUserAction) extends Controller {
 
-  def show = Action {implicit request =>
+  def show = Action { implicit request =>
     Ok(views.html.gateway.accesscode())
   }
 
