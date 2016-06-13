@@ -30,9 +30,9 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
+class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
 
-  import config._
+  import ServiceConfig.config
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
@@ -62,7 +62,7 @@ class APIDataHandler @Inject()(config: ServiceConfig, ws: WSClient, clients: Cli
       val serviceBindings = emprefs.map(e => ServiceBinding(e.service, e.taxIdType, e.taxId)).toList
       val token = Token(t.accessToken, t.scope.get.split("\\s").toList, t.gatewayId, serviceBindings, t.clientId, expiresAt.getMillis)
 
-      ws.url(s"$apiHost/auth/provide-token").put(Json.toJson(token)).map { response =>
+      ws.url(s"${config.api.host}/auth/provide-token").put(Json.toJson(token)).map { response =>
         response.status match {
           case s if s >= 200 && s <= 299 => ()
           case s => throw new Exception(s"/auth/provide-token call resulted in status $s with body ${response.body}")

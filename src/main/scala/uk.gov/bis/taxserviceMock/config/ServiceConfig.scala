@@ -1,10 +1,12 @@
 package uk.gov.bis.taxserviceMock.config
 
-import javax.inject.{Inject, Singleton}
+case class Config(api: ApiConfig)
 
-import play.api.Configuration
+case class ApiConfig(host: String)
 
-@Singleton
-class ServiceConfig @Inject()(config:Configuration){
-  val apiHost = config.getString("api.host").get
+object ServiceConfig {
+
+  import pureconfig._
+
+  lazy val config = loadConfig[Config].get
 }

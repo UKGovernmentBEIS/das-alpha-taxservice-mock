@@ -21,4 +21,3 @@ GET           /admin/applications              uk.gov.bis.taxserviceMock.control
 POST          /admin/add-application           uk.gov.bis.taxserviceMock.controllers.admin.AdminController.addApplication()
 GET           /admin/remove-application        uk.gov.bis.taxserviceMock.controllers.admin.AdminController.removeApplication(id:String)
 
-DELETE        /api/applications/:id            uk.gov.bis.taxserviceMock.controllers.admin.AdminApiController.deleteApplication(id:String)

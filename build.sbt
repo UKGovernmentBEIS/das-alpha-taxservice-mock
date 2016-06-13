@@ -26,5 +26,6 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1208",
   "org.mindrot" % "jbcrypt" % "0.3m",
   "org.typelevel" %% "cats" % "0.4.0",
+  "com.github.melrief" %% "pureconfig" % "0.1.6",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
 )
