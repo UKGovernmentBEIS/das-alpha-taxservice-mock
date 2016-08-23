@@ -17,7 +17,7 @@ trait GatewayIdModule extends SlickModule {
 
   def all(): Future[Seq[GatewayIdRow]] = db.run(GatewayIds.result)
 
-  def validate(gatewayId:String, password:String):Future[Option[GatewayIdRow]] = db.run{
+  def validate(gatewayId: String, password: String): Future[Option[GatewayIdRow]] = db.run {
     GatewayIds.filter(u => u.id === gatewayId && u.password === password).result.headOption
   }
 
@@ -29,7 +29,7 @@ trait GatewayIdModule extends SlickModule {
 
     def password = column[String]("password")
 
-    def * = (id, password) <>(GatewayIdRow.tupled, GatewayIdRow.unapply)
+    def * = (id, password) <> (GatewayIdRow.tupled, GatewayIdRow.unapply)
 
   }
 

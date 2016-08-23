@@ -1,10 +1,11 @@
 name := "das-alpha-taxservice-mock"
 
-enablePlugins(PlayScala)
-disablePlugins(PlayLayoutPlugin)
+lazy val `das-alpha-taxservice-mock` = (project in file("."))
+  .enablePlugins(PlayScala)
+  .disablePlugins(PlayLayoutPlugin)
 
-enablePlugins(GitVersioning)
-enablePlugins(GitBranchPrompt)
+  .enablePlugins(GitVersioning)
+  .enablePlugins(GitBranchPrompt)
 
 git.useGitDescribe := true
 
@@ -25,7 +26,9 @@ libraryDependencies ++= Seq(
   "com.h2database" % "h2" % "1.4.191",
   "org.postgresql" % "postgresql" % "9.4.1208",
   "org.mindrot" % "jbcrypt" % "0.3m",
-  "org.typelevel" %% "cats" % "0.4.0",
+  "org.typelevel" %% "cats" % "0.6.1",
   "com.github.melrief" %% "pureconfig" % "0.1.6",
+  "org.reactivemongo" %% "reactivemongo" % "0.11.14",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
 )
