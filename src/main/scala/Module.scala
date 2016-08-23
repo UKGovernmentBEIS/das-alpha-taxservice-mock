@@ -1,14 +1,12 @@
 import com.google.inject.AbstractModule
-import uk.gov.bis.taxserviceMock.data.GatewayUserOps
-import uk.gov.bis.taxserviceMock.db.gateway.GatewayEnrolmentModule
-import uk.gov.bis.taxserviceMock.mongo.GatewayUserMongo
-import uk.gov.bis.taxserviceMock.playslicks.GatewayEnrolments
+import uk.gov.bis.taxserviceMock.data.{AccessTokenOps, GatewayUserOps}
+import uk.gov.bis.taxserviceMock.mongo.{AccessTokenMongo, GatewayUserMongo}
 
 class Module extends AbstractModule {
 
   override def configure() = {
-    bind(classOf[GatewayEnrolmentModule]).to(classOf[GatewayEnrolments])
     bind(classOf[GatewayUserOps]).to(classOf[GatewayUserMongo])
+    bind(classOf[AccessTokenOps]).to(classOf[AccessTokenMongo])
   }
 
 }

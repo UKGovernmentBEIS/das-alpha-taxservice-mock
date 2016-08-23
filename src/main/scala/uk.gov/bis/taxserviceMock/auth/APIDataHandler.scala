@@ -5,13 +5,12 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.std.future._
-import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import uk.gov.bis.taxserviceMock.config.ServiceConfig
-import uk.gov.bis.taxserviceMock.db.gateway.{GatewayEnrolmentDAO, GatewayIdDAO, GatewayIdRow}
+import uk.gov.bis.taxserviceMock.data.{AccessTokenOps, AccessTokenRow}
+import uk.gov.bis.taxserviceMock.db.gateway.{GatewayIdDAO, GatewayIdRow}
 import uk.gov.bis.taxserviceMock.db.oauth2._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,9 +29,7 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayIds: GatewayIdDAO, enrolments: GatewayEnrolmentDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
-
-  import ServiceConfig.config
+class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayIds: GatewayIdDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
@@ -50,25 +47,7 @@ class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: 
 
     for {
       _ <- accessTokens.create(tokenRow)
-      _ <- sendTokenToApiServer(tokenRow)
     } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
-  }
-
-  def sendTokenToApiServer(t: AccessTokenRow): Future[Unit] = {
-    val expiresIn = t.expiresIn.getOrElse(0L)
-    val expiresAt = new DateTime(t.createdAt).plusSeconds(expiresIn.toInt)
-
-    enrolments.find(t.gatewayId).flatMap { emprefs =>
-      val serviceBindings = emprefs.map(e => ServiceBinding(e.service, e.taxIdType, e.taxId)).toList
-      val token = Token(t.accessToken, t.scope.get.split("\\s").toList, t.gatewayId, serviceBindings, t.clientId, expiresAt.getMillis)
-
-      ws.url(s"${config.api.host}/auth/provide-token").put(Json.toJson(token)).map { response =>
-        response.status match {
-          case s if s >= 200 && s <= 299 => ()
-          case s => throw new Exception(s"/auth/provide-token call resulted in status $s with body ${response.body}")
-        }
-      }
-    }
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayIdRow], refreshToken: String): Future[AccessToken] = {
@@ -81,7 +60,6 @@ class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: 
         val updatedRow = accessTokenRow.copy(accessToken = accessToken, createdAt = createdAt)
         for {
           _ <- accessTokens.deleteExistingAndCreate(updatedRow)
-          _ <- sendTokenToApiServer(updatedRow)
         } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
       case None =>
         val s = s"Cannot find an access token entry with refresh token $refreshToken"

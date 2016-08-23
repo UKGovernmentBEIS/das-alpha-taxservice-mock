@@ -15,26 +15,8 @@ CREATE TABLE "gateway_id" (
   "password" VARCHAR NOT NULL
 );
 
-CREATE TABLE "gateway_enrolment" (
-  "gateway_id"  VARCHAR NOT NULL REFERENCES "gateway_id",
-  "service"     VARCHAR NOT NULL,
-  "tax_id_type" VARCHAR NOT NULL,
-  "tax_id"      VARCHAR NOT NULL
-);
-
 INSERT INTO "gateway_id" ("id", "password") VALUES ('gateway1', 'password');
 INSERT INTO "gateway_id" ("id", "password") VALUES ('gateway2', 'password');
-
-INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
-VALUES ('gateway1', 'epaye', 'empref', '123/AB12345');
-INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
-VALUES ('gateway1', 'epaye', 'empref', '123/BC12345');
-INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
-VALUES ('gateway1', 'epaye', 'empref', '321/ZX54321');
-INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
-VALUES ('gateway1', 'ct', 'ctutr', '123456789');
-INSERT INTO "gateway_enrolment" ("gateway_id", "service", "tax_id_type", "tax_id")
-VALUES ('gateway2', 'epaye', 'empref', '222/MM22222');
 
 CREATE TABLE "client" (
   "id"           VARCHAR NOT NULL PRIMARY KEY,
@@ -78,6 +60,5 @@ DROP TABLE "access_token";
 DROP TABLE "auth_codes";
 DROP TABLE "client";
 
-DROP TABLE "gateway_enrolment";
 DROP TABLE "gateway_id";
 DROP TABLE "scheme";
