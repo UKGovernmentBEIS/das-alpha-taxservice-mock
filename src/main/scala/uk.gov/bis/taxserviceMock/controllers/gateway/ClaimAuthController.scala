@@ -3,20 +3,22 @@ package uk.gov.bis.taxserviceMock.controllers.gateway
 import javax.inject.{Inject, Singleton}
 
 import play.api.mvc.{AnyContent, Controller}
+import play.api.Logger
 import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayIdRequest, GatewayUserAction}
 import uk.gov.bis.taxserviceMock.auth.generateToken
-import uk.gov.bis.taxserviceMock.db.oauth2.AuthCodeOps
+import uk.gov.bis.taxserviceMock.data.AuthCodeOps
 import views.html.helper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDAO: AuthCodeOps)(implicit ec: ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodes: AuthCodeOps)(implicit ec: ExecutionContext) extends Controller {
 
   /**
     * Handle the initial oAuth request
     */
   def authorize(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = GatewayAction.async { implicit request =>
+    Logger.debug("authorize")
     scope match {
       case Some(s) => createAuthCode(s, clientId, redirectUri, state, request).map { url =>
         Redirect(url).removingFromSession(GatewayAction.sessionKey)
@@ -28,7 +30,7 @@ class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodeDA
   def createAuthCode(scope: String, clientId: String, redirectUri: String, state: Option[String], request: GatewayIdRequest[AnyContent]): Future[String] = {
     val authCode = generateToken
 
-    authCodeDAO.create(authCode, request.ggId.id, redirectUri, clientId, scope).map { _ =>
+    authCodes.create(authCode, request.user.gatewayID, redirectUri, clientId, scope).map { _ =>
       state match {
         case Some(s) => s"$redirectUri?code=$authCode&state=${helper.urlEncode(s)}"
         case None => s"$redirectUri?code=$authCode"

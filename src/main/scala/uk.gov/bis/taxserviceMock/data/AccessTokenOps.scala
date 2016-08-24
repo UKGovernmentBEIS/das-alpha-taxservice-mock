@@ -5,11 +5,11 @@ import scala.concurrent.{ExecutionContext, Future}
 case class AccessTokenRow(
                            accessToken: String,
                            refreshToken: Option[String],
-                           gatewayId: String,
+                           gatewayID: String,
                            scope: Option[String],
                            expiresIn: Option[Long],
                            createdAt: Long,
-                           clientId: String)
+                           clientID: String)
 
 trait AccessTokenOps {
   def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AccessTokenRow]]

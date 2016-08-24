@@ -9,7 +9,7 @@ import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import uk.gov.bis.taxserviceMock.data.{AccessTokenOps, AccessTokenRow}
+import uk.gov.bis.taxserviceMock.data._
 import uk.gov.bis.taxserviceMock.db.gateway.{GatewayIdDAO, GatewayIdRow}
 import uk.gov.bis.taxserviceMock.db.oauth2._
 
@@ -29,7 +29,7 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayIds: GatewayIdDAO)(implicit ec: ExecutionContext) extends DataHandler[GatewayIdRow] {
+class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers:GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
@@ -38,19 +38,19 @@ class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: 
     }
   }
 
-  override def createAccessToken(authInfo: AuthInfo[GatewayIdRow]): Future[AccessToken] = {
+  override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
-    val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.id, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
+    val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
 
     for {
       _ <- accessTokens.create(tokenRow)
     } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
   }
 
-  override def refreshAccessToken(authInfo: AuthInfo[GatewayIdRow], refreshToken: String): Future[AccessToken] = {
+  override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
@@ -68,16 +68,16 @@ class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: 
     }
   }
 
-  override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayIdRow]]] = {
+  override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUser]]] = {
     for {
       at <- OptionT(accessTokens.forRefreshToken(refreshToken))
-      u <- OptionT(gatewayIds.byId(at.gatewayId))
-    } yield AuthInfo(u, Some(at.clientId), at.scope, None)
+      u <- OptionT(gatewayUsers.forGatewayID(at.gatewayID))
+    } yield AuthInfo(u, Some(at.clientID), at.scope, None)
   }.value
 
 
-  override def getStoredAccessToken(authInfo: AuthInfo[GatewayIdRow]): Future[Option[AccessToken]] = {
-    OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map { token =>
+  override def getStoredAccessToken(authInfo: AuthInfo[GatewayUser]): Future[Option[AccessToken]] = {
+    OptionT(accessTokens.find(authInfo.user.gatewayID, authInfo.clientId)).map { token =>
       AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
     }
   }.value
@@ -88,29 +88,29 @@ class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: 
     }
   }.value
 
-  override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayIdRow]]] = {
+  override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayUser]]] = {
     for {
       token <- OptionT(authCodes.find(code))
-      user <- OptionT(gatewayIds.byId(token.gatewayId))
+      user <- OptionT(gatewayUsers.forGatewayID(token.gatewayId))
     } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 
   override def deleteAuthCode(code: String): Future[Unit] = authCodes.delete(code).map(_ => ())
 
-  override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayIdRow]]] = {
+  override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayUser]]] = {
     for {
       token <- OptionT(accessTokens.forAccessToken(accessToken.token))
-      user <- OptionT(gatewayIds.byId(token.gatewayId))
-    } yield AuthInfo(user, Some(token.clientId), token.scope, None)
+      user <- OptionT(gatewayUsers.forGatewayID(token.gatewayID))
+    } yield AuthInfo(user, Some(token.clientID), token.scope, None)
   }.value
 
 
-  override def findUser(request: AuthorizationRequest): Future[Option[GatewayIdRow]] = {
+  override def findUser(request: AuthorizationRequest): Future[Option[GatewayUser]] = {
     OptionT.fromOption(request.clientCredential).flatMap {
       cred =>
-        OptionT(gatewayIds.byId(cred.clientId)).filter {
+        OptionT(gatewayUsers.forGatewayID(cred.clientId)).filter {
           u =>
-            BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)
+            BCrypt.checkpw(cred.clientSecret.get, u.password)
         }
     }
   }.value

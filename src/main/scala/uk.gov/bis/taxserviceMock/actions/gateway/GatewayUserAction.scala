@@ -4,14 +4,15 @@ import com.google.inject.Inject
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.bis.taxserviceMock.controllers._
+import uk.gov.bis.taxserviceMock.data._
 import uk.gov.bis.taxserviceMock.db.gateway._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class GatewayIdRequest[A](val request: Request[A], val ggId: GatewayIdRow) extends WrappedRequest[A](request)
+class GatewayIdRequest[A](val request: Request[A], val user: GatewayUser) extends WrappedRequest[A](request)
 
-class GatewayUserAction @Inject()(gatewayIds: GatewayIdDAO)(implicit ec: ExecutionContext)
+class GatewayUserAction @Inject()(gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext)
   extends ActionBuilder[GatewayIdRequest]
     with ActionRefiner[Request, GatewayIdRequest] {
 
@@ -26,7 +27,7 @@ class GatewayUserAction @Inject()(gatewayIds: GatewayIdDAO)(implicit ec: Executi
 
     request.session.get(sessionKey) match {
       case None => Future.successful(redirectToSignIn)
-      case Some(id) => gatewayIds.byId(id).map {
+      case Some(id) => gatewayUsers.forGatewayID(id).map {
         case Some(u) => Right(new GatewayIdRequest(request, u))
         case None => redirectToSignIn
       }
