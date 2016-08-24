@@ -19,6 +19,7 @@
         <article class="content__body">
             <h1>Sign in</h1>
             <p>Enter your Government Gateway credentials to sign in. You received these when you created your HMRC online account.</p>
+            <div class="alert">NOTE: This is a mockup of the HMRC Tax Platform - DO NOT ENTER LIVE GATEWAY CREDENTIALS!</div>
             <form method="post" action="@gateway.routes.GatewaySignInController.handleSignIn()">
                 <div id="errors">
                 @form.errors.map { e => <div>@e.messages.head</div> }
