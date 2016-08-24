@@ -10,8 +10,6 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import uk.gov.bis.taxserviceMock.data._
-import uk.gov.bis.taxserviceMock.db.gateway.{GatewayIdDAO, GatewayIdRow}
-import uk.gov.bis.taxserviceMock.db.oauth2._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
@@ -29,11 +27,11 @@ object Token {
 }
 
 @Singleton
-class APIDataHandler @Inject()( ws: WSClient, clients: ClientDAO, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers:GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
+class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers:GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
-      case Some(cred) => clients.validate(cred.clientId, cred.clientSecret, request.grantType)
+      case Some(cred) => applications.validate(cred.clientId, cred.clientSecret, request.grantType)
       case None => Future.successful(false)
     }
   }

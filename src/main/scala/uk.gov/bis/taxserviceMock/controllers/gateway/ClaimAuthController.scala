@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.mvc.{AnyContent, Controller}
 import play.api.Logger
-import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayIdRequest, GatewayUserAction}
+import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayUserRequest, GatewayUserAction}
 import uk.gov.bis.taxserviceMock.auth.generateToken
 import uk.gov.bis.taxserviceMock.data.AuthCodeOps
 import views.html.helper
@@ -27,7 +27,7 @@ class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodes:
     }
   }
 
-  def createAuthCode(scope: String, clientId: String, redirectUri: String, state: Option[String], request: GatewayIdRequest[AnyContent]): Future[String] = {
+  def createAuthCode(scope: String, clientId: String, redirectUri: String, state: Option[String], request: GatewayUserRequest[AnyContent]): Future[String] = {
     val authCode = generateToken
 
     authCodes.create(authCode, request.user.gatewayID, redirectUri, clientId, scope).map { _ =>
