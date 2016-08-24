@@ -20,7 +20,8 @@ class LoggingFilter @Inject()(implicit val mat: Materializer, ec: ExecutionConte
       val endTime = System.currentTimeMillis
       val requestTime = endTime - startTime
 
-      Logger.info(s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
+      if (!requestHeader.uri.startsWith("/assets"))
+        Logger.info(s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
 
       result.withHeaders("Request-Time" -> requestTime.toString)
     }

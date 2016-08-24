@@ -1,7 +1,7 @@
 package uk.gov.bis.taxserviceMock.auth
 
 import java.util.Date
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.std.future._
@@ -26,10 +26,13 @@ object Token {
   implicit val formats = Json.format[Token]
 }
 
-@Singleton
-class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers:GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
+/**
+  * Provides the behaviours needed by the OAuth2Provider to create and retrieve access tokens
+  */
+class APIDataHandler @Inject()(ws: WSClient, applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
+    Logger.debug("validate client")
     request.clientCredential match {
       case Some(cred) => applications.validate(cred.clientId, cred.clientSecret, request.grantType)
       case None => Future.successful(false)
@@ -37,6 +40,7 @@ class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, acce
   }
 
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
+    Logger.debug("create access token")
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
@@ -49,6 +53,7 @@ class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, acce
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
+    Logger.debug("refresh access token")
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
@@ -67,6 +72,7 @@ class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, acce
   }
 
   override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUser]]] = {
+    Logger.debug("find auth info by refresh token")
     for {
       at <- OptionT(accessTokens.forRefreshToken(refreshToken))
       u <- OptionT(gatewayUsers.forGatewayID(at.gatewayID))
@@ -75,27 +81,34 @@ class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, acce
 
 
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUser]): Future[Option[AccessToken]] = {
+    Logger.debug("get stored access token using AuthInfo")
     OptionT(accessTokens.find(authInfo.user.gatewayID, authInfo.clientId)).map { token =>
       AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
     }
   }.value
 
   override def findAccessToken(token: String): Future[Option[AccessToken]] = {
+    Logger.debug("find access token by String")
     OptionT(accessTokens.forAccessToken(token)).map { token =>
       AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
     }
   }.value
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayUser]]] = {
+    Logger.debug("find auth info by code")
     for {
       token <- OptionT(authCodes.find(code))
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayId))
     } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 
-  override def deleteAuthCode(code: String): Future[Unit] = authCodes.delete(code).map(_ => ())
+  override def deleteAuthCode(code: String): Future[Unit] = {
+    Logger.debug("delete auth code")
+    authCodes.delete(code).map(_ => ())
+  }
 
   override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayUser]]] = {
+    Logger.debug("find auth info by access token")
     for {
       token <- OptionT(accessTokens.forAccessToken(accessToken.token))
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayID))
@@ -104,6 +117,7 @@ class APIDataHandler @Inject()( ws: WSClient, applications: ApplicationOps, acce
 
 
   override def findUser(request: AuthorizationRequest): Future[Option[GatewayUser]] = {
+    Logger.debug("find user by AuthorizationRequest")
     OptionT.fromOption(request.clientCredential).flatMap {
       cred =>
         OptionT(gatewayUsers.forGatewayID(cred.clientId)).filter {

@@ -2,9 +2,9 @@ package uk.gov.bis.taxserviceMock.controllers.gateway
 
 import javax.inject.{Inject, Singleton}
 
-import play.api.mvc.{AnyContent, Controller}
 import play.api.Logger
-import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayUserRequest, GatewayUserAction}
+import play.api.mvc.{AnyContent, Controller}
+import uk.gov.bis.taxserviceMock.actions.gateway.{GatewayUserAction, GatewayUserRequest}
 import uk.gov.bis.taxserviceMock.auth.generateToken
 import uk.gov.bis.taxserviceMock.data.AuthCodeOps
 import views.html.helper
@@ -20,9 +20,10 @@ class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodes:
   def authorize(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = GatewayAction.async { implicit request =>
     Logger.debug("authorize")
     scope match {
-      case Some(s) => createAuthCode(s, clientId, redirectUri, state, request).map { url =>
-        Redirect(url).removingFromSession(GatewayAction.sessionKey)
-      }
+      case Some(s) =>
+        createAuthCode(s, clientId, redirectUri, state, request).map { url =>
+          Redirect(url).removingFromSession(GatewayAction.sessionKey)
+        }
       case None => Future.successful(BadRequest("missing scope"))
     }
   }

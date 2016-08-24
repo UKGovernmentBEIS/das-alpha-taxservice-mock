@@ -1,6 +1,6 @@
 @import uk.gov.bis.taxserviceMock.controllers.gateway
 
-@()
+@(authId:String)
 
 @proposition = {
     <div class="header-proposition">
@@ -12,25 +12,28 @@
     </div>
 }
 
-@main("Enter your access code", insideHeader = proposition) {
+@main("HMRC Tax Platform", insideHeader = proposition) {
     <div>
         <article class="content__body">
-            <h1>Enter your access code.</h1>
-            <p>We just sent a 6-digit access code by text to: <strong>*********000</strong></p>
-            <p>It may take a few minutes to arrive.</p>
-            <div class="alert">No need to enter anything here - just press Continue.</div>
-            <form method="post" action="@gateway.routes.AccessCodeController.handleAccessCode()">
+            <h1>Authority to interact with HMRC on your behalf</h1>
+            <p>The <strong>DAS Alpha Client Mock</strong> software application is requesting to do the following:</p>
+            <ul>
+                <li>access levy data</li>
+            </ul>
+            <p>It will be able to do the above for 10 hours from when you grant authority.</p>
+            <form method="post" action="@gateway.routes.GrantScopeController.grantScope(authId)">
                 <fieldset class="form-field-group">
                     <div class="form-field">
                         <label class="label--inline" for="accessCode">Access code</label>
                         <input type="text" id="accessCode" name="accessCode" required />
                     </div>
                     <div class="form-field">
-                        <input class="button" type="submit" value="Continue"/>
+                        <input class="button" type="submit" value="Grant Authority"/>
+                        <a href="">Do not grant authority</a>
                     </div>
                 </fieldset>
             </form>
-            <a href="">I haven't got access to that phone</a>
+            <a href="" rel="external" target="_blank">You can remove this authority at any time.</a>
         </article>
     </div>
 }
