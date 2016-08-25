@@ -17,7 +17,6 @@ resolvers += Resolver.bintrayRepo("hmrc", "releases")
 resolvers += "Madoushi sbt-plugins" at "https://dl.bintray.com/madoushi/sbt-plugins/"
 
 libraryDependencies ++= Seq(
-  cache,
   ws,
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.17.0",
   "uk.gov.hmrc" %% "domain" % "3.5.0",

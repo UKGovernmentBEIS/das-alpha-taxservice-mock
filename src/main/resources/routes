@@ -11,8 +11,6 @@ GET         /gateway/sign-out           uk.gov.bis.taxserviceMock.controllers.ga
 GET         /gateway/access-code        uk.gov.bis.taxserviceMock.controllers.gateway.AccessCodeController.show
 POST        /gateway/access-code        uk.gov.bis.taxserviceMock.controllers.gateway.AccessCodeController.handleAccessCode
 
-POST        /oauth/token                uk.gov.bis.taxserviceMock.controllers.security.OAuth2Controller.accessToken
-GET         /oauth/authorize            uk.gov.bis.taxserviceMock.controllers.gateway.ClaimAuthController.authorize(scope:Option[String], client_id:String, redirect_uri :String, state:Option[String])
 GET         /oauth/grantscope           uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.show(auth_id: String)
 POST        /oauth/grantscope           uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.grantScope(auth_id: String)
 
