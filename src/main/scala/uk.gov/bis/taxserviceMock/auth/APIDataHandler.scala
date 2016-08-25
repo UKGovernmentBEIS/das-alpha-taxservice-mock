@@ -4,11 +4,10 @@ import java.util.Date
 import javax.inject.Inject
 
 import cats.data.OptionT
-import cats.std.future._
+import cats.instances.future._
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.libs.ws.WSClient
 import uk.gov.bis.taxserviceMock.data._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +28,7 @@ object Token {
 /**
   * Provides the behaviours needed by the OAuth2Provider to create and retrieve access tokens
   */
-class APIDataHandler @Inject()(ws: WSClient, applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
+class APIDataHandler @Inject()(applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     Logger.debug("validate client")
