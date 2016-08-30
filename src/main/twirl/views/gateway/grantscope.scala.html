@@ -1,6 +1,8 @@
 @import uk.gov.bis.taxserviceMock.controllers.gateway
+@import uk.gov.bis.taxserviceMock.data.AuthId
+@import uk.gov.bis.taxserviceMock.data.GatewayUser
 
-@(authId:String)
+@(auth: AuthId, user:GatewayUser)
 
 @proposition = {
     <div class="header-proposition">
@@ -21,7 +23,7 @@
                 <li>access levy data</li>
             </ul>
             <p>It will be able to do the above for 10 hours from when you grant authority.</p>
-            <form method="post" action="@gateway.routes.GrantScopeController.grantScope(authId)">
+            <form method="post" action="@gateway.routes.GrantScopeController.grantScope(auth.id.get)">
                 <fieldset class="form-field-group">
                     <div class="form-field">
                         <label class="label--inline" for="accessCode">Access code</label>

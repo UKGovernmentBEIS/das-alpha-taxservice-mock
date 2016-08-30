@@ -22,23 +22,25 @@ class GatewaySignInController @Inject()(gatewayUsers: GatewayUserOps, UserAction
     )(UserData.apply)(UserData.unapply)
   )
 
-  def showSignIn = Action {
-    Ok(views.html.gateway.signIn(userForm))
+  def show(continue: String, origin: Option[String]) = Action {
+    Ok(views.html.gateway.signIn(continue, origin, userForm))
   }
 
-  def handleSignIn = Action.async { implicit request =>
+  def handleSignIn(continue: String, origin: Option[String]) = Action.async { implicit request =>
     userForm.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(views.html.gateway.signIn(formWithErrors))),
+      formWithErrors => Future.successful(BadRequest(views.html.gateway.signIn(continue, origin, formWithErrors))),
       userData => {
         gatewayUsers.validate(userData.userId, userData.password).map {
-          case Some(user) => Redirect(routes.AccessCodeController.show()).addingToSession((UserAction.validatedUserKey, user.gatewayID))
-          case None => Ok(views.html.gateway.signIn(userForm.withError("username", "Bad user name or password")))
+          case Some(user) =>
+            if (user.require2SV.getOrElse(false))
+              Redirect(routes.AccessCodeController.show(continue, origin)).addingToSession((UserAction.validatedUserKey, user.gatewayID))
+            else
+              Redirect(continue).addingToSession((UserAction.validatedUserKey, user.gatewayID))
+
+          case None => Ok(views.html.gateway.signIn(continue, origin, userForm.withError("username", "Bad user name or password")))
         }
       }
     )
   }
 
-  def signOut = Action {
-    Redirect(routes.GatewaySignInController.showSignIn()).withNewSession
-  }
 }

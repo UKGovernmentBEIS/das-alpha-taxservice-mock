@@ -28,6 +28,7 @@ class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodes:
     }
   }
 
+
   def createAuthCode(scope: String, clientId: String, redirectUri: String, state: Option[String], request: GatewayUserRequest[AnyContent]): Future[String] = {
     val authCode = generateToken
 

@@ -5,7 +5,6 @@ import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json._
 import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,12 +16,7 @@ class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollec
 
   override def find(code: String)(implicit ec: ExecutionContext) = findOne("authorizationCode" -> code)
 
-  override def delete(code: String)(implicit ec: ExecutionContext): Future[Int] = {
-    for {
-      coll <- collectionF
-      i <- coll.remove(Json.obj("authorizationCode" -> code))
-    } yield i.n
-  }
+  override def delete(code: String)(implicit ec: ExecutionContext): Future[Int] = remove("authorizationCode" -> code)
 
   override def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, scope: String)(implicit ec: ExecutionContext): Future[Int] = {
     Logger.debug("create auth code entry")
@@ -30,6 +24,13 @@ class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollec
     for {
       coll <- collectionF
       i <- coll.insert(row)
+    } yield i.n
+  }
+
+  override def insert(authCode: AuthCodeRow)(implicit ec: ExecutionContext): Future[Int] = {
+    for {
+      coll <- collectionF
+      i <- coll.insert(authCode)
     } yield i.n
   }
 }

@@ -10,4 +10,6 @@ trait AuthCodeOps {
   def delete(code: String)(implicit ec: ExecutionContext): Future[Int]
 
   def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, scope: String)(implicit ec: ExecutionContext): Future[Int]
+
+  def insert(authCode: AuthCodeRow)(implicit ec: ExecutionContext): Future[Int]
 }

@@ -1,6 +1,6 @@
 import com.google.inject.AbstractModule
-import uk.gov.bis.taxserviceMock.data.{AccessTokenOps, ApplicationOps, AuthCodeOps, GatewayUserOps}
-import uk.gov.bis.taxserviceMock.mongo.{AccessTokenMongo, ApplicationMongo, AuthCodeMongo, GatewayUserMongo}
+import uk.gov.bis.taxserviceMock.data._
+import uk.gov.bis.taxserviceMock.mongo._
 
 class Module extends AbstractModule {
 
@@ -8,6 +8,7 @@ class Module extends AbstractModule {
     bind(classOf[GatewayUserOps]).to(classOf[GatewayUserMongo])
     bind(classOf[AccessTokenOps]).to(classOf[AccessTokenMongo])
     bind(classOf[AuthCodeOps]).to(classOf[AuthCodeMongo])
+    bind(classOf[AuthIdOps]).to(classOf[AuthIdMongo])
     bind(classOf[ApplicationOps]).to(classOf[ApplicationMongo])
   }
 }
