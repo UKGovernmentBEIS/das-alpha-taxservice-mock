@@ -8,12 +8,13 @@ import cats.instances.future._
 import cats.syntax.xor._
 import play.api.mvc.Controller
 import uk.gov.bis.taxserviceMock.actions.gateway.GatewayUserAction
-import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow, AuthIdOps, ScopeOps}
+import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow, AuthRequestOps, ScopeOps}
 import views.html.helper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthIdOps, authCodes: AuthCodeOps, scopes: ScopeOps)(implicit ec: ExecutionContext) extends Controller {
+class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthRequestOps, authCodes: AuthCodeOps, scopes: ScopeOps)(implicit ec: ExecutionContext) extends Controller {
+
   implicit class ErrorSyntax[A](ao: Option[A]) {
     def orError(err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
   }
@@ -25,12 +26,12 @@ class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthI
     } yield (a, s)
 
     x.value.map {
-      case Right((auth, scope)) =>  Ok(views.html.gateway.grantscope(auth.id, request.user.name, scope.description))
+      case Right((auth, scope)) => Ok(views.html.gateway.grantscope(auth.id, request.user.name, scope.description))
       case Left(err) => BadRequest(err)
     }
   }
 
-  def cancel(authId:Long) = UserAction.async { implicit request =>
+  def cancel(authId: Long) = UserAction.async { implicit request =>
     auths.pop(authId).map(_.orError("unknown auth id")).map {
       case Right(auth) => Redirect(s"${auth.redirectUri}?error=access_denied&error_description=user+denied+the+authorization&error_code=USER_DENIED_AUTHORIZATION")
       case Left(err) => BadRequest(err)
