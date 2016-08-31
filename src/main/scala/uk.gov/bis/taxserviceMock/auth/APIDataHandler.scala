@@ -28,7 +28,7 @@ object Token {
 /**
   * Provides the behaviours needed by the OAuth2Provider to create and retrieve access tokens
   */
-class APIDataHandler @Inject()(applications: ClientOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
+class APIDataHandler @Inject()(applications: ClientOps, accessTokens: AuthRecordOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     Logger.debug("validate client")
@@ -40,15 +40,15 @@ class APIDataHandler @Inject()(applications: ClientOps, accessTokens: AccessToke
 
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
     Logger.debug("create access token")
-    val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
+    val accessTokenExpiresIn = 60L * 60L // 1 hour
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
-    val tokenRow = AccessTokenRow(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
+    val tokenRow = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
 
     for {
       _ <- accessTokens.create(tokenRow)
-    } yield AccessToken(accessToken, refreshToken, authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
+    } yield AccessToken(accessToken, refreshToken, authInfo.scope, Some(accessTokenExpiresIn), new Date(createdAt))
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
@@ -82,14 +82,14 @@ class APIDataHandler @Inject()(applications: ClientOps, accessTokens: AccessToke
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUser]): Future[Option[AccessToken]] = {
     Logger.debug("get stored access token using AuthInfo")
     OptionT(accessTokens.find(authInfo.user.gatewayID, authInfo.clientId)).map { token =>
-      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
+      AccessToken(token.accessToken, token.refreshToken, token.scope, Some(token.expiresIn), new Date(token.createdAt))
     }
   }.value
 
   override def findAccessToken(token: String): Future[Option[AccessToken]] = {
     Logger.debug("find access token by String")
     OptionT(accessTokens.forAccessToken(token)).map { token =>
-      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, new Date(token.createdAt))
+      AccessToken(token.accessToken, token.refreshToken, token.scope, Some(token.expiresIn), new Date(token.createdAt))
     }
   }.value
 

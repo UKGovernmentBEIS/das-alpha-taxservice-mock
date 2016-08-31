@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[AuthCodeRow] with AuthCodeOps {
   implicit val fmt = Json.format[AuthCodeRow]
 
-  override val collectionName: String = "auth_codes"
+  override val collectionName: String = "sys_auth_codes"
 
   override def find(code: String)(implicit ec: ExecutionContext) = findOne("authorizationCode" -> code)
 

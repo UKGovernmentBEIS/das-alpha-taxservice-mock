@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 class AuthRequestMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[AuthRequest] with AuthRequestOps {
-  override val collectionName = "auth_requests"
+  override val collectionName = "sys_auth_requests"
 
   implicit val authIdF = Json.format[AuthRequest]
 
