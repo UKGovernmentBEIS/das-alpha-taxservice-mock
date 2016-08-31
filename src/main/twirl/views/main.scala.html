@@ -1,4 +1,4 @@
-@(title: String, mainClass: Option[String] = None, bodyEnd: Html = Html(""), headExtra: Html = Html(""), insideHeader :Html = Html(""), links: Html = Html(""))(content: Html)
+@(title: String, mainClass: Option[String] = None, bodyEnd: Html = Html(""), headExtra: Html = Html(""), insideHeader :Html = Html(""), logoRight:Html = Html(""), links: Html = Html(""))(content: Html)
 
 @head = {
     <link href="@routes.Assets.at("stylesheets/fonts.css")" media="screen" rel="stylesheet" type="text/css" />
@@ -10,13 +10,14 @@
 @empty = {}
 
 
-@layouts.govuk_template2(Some(title), None)(head, empty, bodyEnd, insideHeader, empty, empty) {
+@layouts.govuk_template2(Some(title), None)(head, empty, bodyEnd, insideHeader) {
     <main id="content" class="@mainClass" role="main">
         <div class="service-info ">
 
             <div class="logo">
                 <span class="organisation-logo organisation-logo-medium">HM Revenue &amp; Customs</span>
             </div>
+            @logoRight
 
         </div>
     @content

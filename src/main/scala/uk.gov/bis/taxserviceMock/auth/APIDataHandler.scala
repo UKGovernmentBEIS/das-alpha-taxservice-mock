@@ -28,7 +28,7 @@ object Token {
 /**
   * Provides the behaviours needed by the OAuth2Provider to create and retrieve access tokens
   */
-class APIDataHandler @Inject()(applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
+class APIDataHandler @Inject()(applications: ClientOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     Logger.debug("validate client")

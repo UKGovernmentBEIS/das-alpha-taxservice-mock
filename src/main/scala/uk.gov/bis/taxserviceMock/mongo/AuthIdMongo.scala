@@ -18,7 +18,7 @@ class AuthIdMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollecti
     val id = Random.nextLong().abs
     for {
       collection <- collectionF
-      r <- collection.insert(authId.copy(id = Some(id)))
+      r <- collection.insert(authId.copy(id = id))
     } yield id
   }
 

@@ -13,4 +13,5 @@ POST        /gg/access-code          uk.gov.bis.taxserviceMock.controllers.gatew
 
 GET         /oauth/grantscope        uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.show(auth_id: Long)
 POST        /oauth/grantscope        uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.grantScope(auth_id: Long)
+GET         /oauth/cancel            uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.cancel(auth_id: Long)
 

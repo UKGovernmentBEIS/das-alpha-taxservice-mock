@@ -9,6 +9,7 @@ class Module extends AbstractModule {
     bind(classOf[AccessTokenOps]).to(classOf[AccessTokenMongo])
     bind(classOf[AuthCodeOps]).to(classOf[AuthCodeMongo])
     bind(classOf[AuthIdOps]).to(classOf[AuthIdMongo])
-    bind(classOf[ApplicationOps]).to(classOf[ApplicationMongo])
+    bind(classOf[ClientOps]).to(classOf[ClientMongo])
+    bind(classOf[ScopeOps]).to(classOf[ScopeMongo])
   }
 }

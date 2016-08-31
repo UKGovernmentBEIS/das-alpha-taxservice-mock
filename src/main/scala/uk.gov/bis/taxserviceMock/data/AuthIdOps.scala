@@ -2,7 +2,7 @@ package uk.gov.bis.taxserviceMock.data
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthId(scope: String, clientId: String, redirectUri: String, state: Option[String], id: Option[Long] = None, creationDate: Long = System.currentTimeMillis())
+case class AuthId(scope: String, clientId: String, redirectUri: String, state: Option[String], id: Long= 0, creationDate: Long = System.currentTimeMillis())
 
 trait AuthIdOps {
   /**

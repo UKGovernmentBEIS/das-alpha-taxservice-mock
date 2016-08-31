@@ -1,8 +1,6 @@
 @import uk.gov.bis.taxserviceMock.controllers.gateway
-@import uk.gov.bis.taxserviceMock.data.AuthId
-@import uk.gov.bis.taxserviceMock.data.GatewayUser
 
-@(auth: AuthId, user:GatewayUser)
+@(authId: Long, userName:String, scopeDescription:String)
 
 @proposition = {
     <div class="header-proposition">
@@ -14,24 +12,26 @@
     </div>
 }
 
-@main("HMRC Tax Platform", insideHeader = proposition) {
+@extra = {
+    <div class="last-login float--right">
+        <p class="flush text--right h3-heading">@userName</p>
+    </div>
+}
+
+@main("HMRC Tax Platform", insideHeader = proposition, logoRight = extra) {
     <div>
         <article class="content__body">
             <h1>Authority to interact with HMRC on your behalf</h1>
             <p>The <strong>DAS Alpha Client Mock</strong> software application is requesting to do the following:</p>
             <ul>
-                <li>access levy data</li>
+                <li class="bullets">@scopeDescription</li>
             </ul>
             <p>It will be able to do the above for 10 hours from when you grant authority.</p>
-            <form method="post" action="@gateway.routes.GrantScopeController.grantScope(auth.id.get)">
+            <form method="post" action="@gateway.routes.GrantScopeController.grantScope(authId)">
                 <fieldset class="form-field-group">
                     <div class="form-field">
-                        <label class="label--inline" for="accessCode">Access code</label>
-                        <input type="text" id="accessCode" name="accessCode" required />
-                    </div>
-                    <div class="form-field">
                         <input class="button" type="submit" value="Grant Authority"/>
-                        <a href="">Do not grant authority</a>
+                        <a href="@gateway.routes.GrantScopeController.cancel(authId)">Do not grant authority</a>
                     </div>
                 </fieldset>
             </form>

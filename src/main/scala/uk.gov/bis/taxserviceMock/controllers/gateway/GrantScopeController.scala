@@ -2,28 +2,44 @@ package uk.gov.bis.taxserviceMock.controllers.gateway
 
 import javax.inject.Inject
 
+import cats.data.Xor.{Left, Right}
+import cats.data.{Xor, XorT}
+import cats.instances.future._
+import cats.syntax.xor._
 import play.api.mvc.Controller
 import uk.gov.bis.taxserviceMock.actions.gateway.GatewayUserAction
-import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow, AuthIdOps}
+import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow, AuthIdOps, ScopeOps}
 import views.html.helper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthIdOps, authCodes: AuthCodeOps)(implicit ec: ExecutionContext) extends Controller {
+class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthIdOps, authCodes: AuthCodeOps, scopes: ScopeOps)(implicit ec: ExecutionContext) extends Controller {
+  implicit class ErrorSyntax[A](ao: Option[A]) {
+    def orError(err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
+  }
 
   def show(authId: Long) = UserAction.async { implicit request =>
-    auths.get(authId).map {
-      case Some(auth) => Ok(views.html.gateway.grantscope(auth, request.user))
-      case None => BadRequest
+    val x = for {
+      a <- XorT(auths.get(authId).map(_.orError("unknown auth id")))
+      s <- XorT(scopes.byName(a.scope).map(_.orError("unknown scope")))
+    } yield (a, s)
+
+    x.value.map {
+      case Right((auth, scope)) =>  Ok(views.html.gateway.grantscope(auth.id, request.user.name, scope.description))
+      case Left(err) => BadRequest(err)
+    }
+  }
+
+  def cancel(authId:Long) = UserAction.async { implicit request =>
+    auths.pop(authId).map(_.orError("unknown auth id")).map {
+      case Right(auth) => Redirect(s"${auth.redirectUri}?error=access_denied&error_description=user+denied+the+authorization&error_code=USER_DENIED_AUTHORIZATION")
+      case Left(err) => BadRequest(err)
     }
   }
 
   /**
     * If there is no AuthId record corresponding to the given code then it's a bad request.
     * Otherwise establish a new AuthCode record linked to the user and call back to the oAuth client
-    *
-    * @param authId
-    * @return
     */
   def grantScope(authId: Long) = UserAction.async { implicit request =>
     import uk.gov.bis.taxserviceMock.auth.generateToken
@@ -35,10 +51,10 @@ class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthI
         val authCode = AuthCodeRow(token, request.user.gatewayID, "", System.currentTimeMillis(), Some(auth.scope), Some(auth.clientId), 4 * 60 * 60)
         authCodes.insert(authCode).map { _ =>
           val uri = auth.state match {
-            case Some(s) => s"${auth.redirectUri}?code=$authCode&state=${helper.urlEncode(s)}"
-            case None => s"${auth.redirectUri}?code=$authCode"
+            case Some(s) => s"${auth.redirectUri}?code=${authCode.authorizationCode}&state=${helper.urlEncode(s)}"
+            case None => s"${auth.redirectUri}?code=${authCode.authorizationCode}"
           }
-          Redirect(auth.redirectUri).removingFromSession(UserAction.validatedUserKey)
+          Redirect(uri).removingFromSession(UserAction.validatedUserKey)
         }
     }
   }

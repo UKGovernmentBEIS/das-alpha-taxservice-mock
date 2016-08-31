@@ -6,11 +6,11 @@ import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
-import uk.gov.bis.taxserviceMock.data.{ApplicationOps, AuthCodeRow}
+import uk.gov.bis.taxserviceMock.data.{AuthCodeRow, ClientOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationMongo @Inject()(val mongodb: ReactiveMongoApi) extends ApplicationOps {
+class ClientMongo @Inject()(val mongodb: ReactiveMongoApi) extends ClientOps {
   implicit val fmt = Json.format[AuthCodeRow]
 
   def collectionF(implicit ec: ExecutionContext): Future[JSONCollection] = mongodb.database.map(_.collection[JSONCollection]("applications"))
