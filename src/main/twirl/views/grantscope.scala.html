@@ -1,4 +1,4 @@
-@import uk.gov.bis.taxserviceMock.controllers.gateway
+@import uk.gov.bis.taxserviceMock.controllers._
 
 @(authId: Long, userName:String, scopeDescription:String)
 
@@ -27,11 +27,11 @@
                 <li class="bullets">@scopeDescription</li>
             </ul>
             <p>It will be able to do the above for 10 hours from when you grant authority.</p>
-            <form method="post" action="@gateway.routes.GrantScopeController.grantScope(authId)">
+            <form method="post" action="@routes.GrantScopeController.grantScope(authId)">
                 <fieldset class="form-field-group">
                     <div class="form-field">
                         <input class="button" type="submit" value="Grant Authority"/>
-                        <a href="@gateway.routes.GrantScopeController.cancel(authId)">Do not grant authority</a>
+                        <a href="@routes.GrantScopeController.cancel(authId)">Do not grant authority</a>
                     </div>
                 </fieldset>
             </form>

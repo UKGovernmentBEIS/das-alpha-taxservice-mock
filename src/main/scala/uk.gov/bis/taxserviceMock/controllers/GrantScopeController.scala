@@ -1,4 +1,4 @@
-package uk.gov.bis.taxserviceMock.controllers.gateway
+package uk.gov.bis.taxserviceMock.controllers
 
 import javax.inject.Inject
 
@@ -7,7 +7,7 @@ import cats.data.{Xor, XorT}
 import cats.instances.future._
 import cats.syntax.xor._
 import play.api.mvc.Controller
-import uk.gov.bis.taxserviceMock.actions.gateway.GatewayUserAction
+import uk.gov.bis.taxserviceMock.actions.GatewayUserAction
 import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow, AuthRequestOps, ScopeOps}
 import views.html.helper
 
@@ -26,7 +26,7 @@ class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthR
     } yield (a, s)
 
     x.value.map {
-      case Right((auth, scope)) => Ok(views.html.gateway.grantscope(auth.id, request.user.name, scope.description))
+      case Right((auth, scope)) => Ok(views.html.grantscope(auth.id, request.user.name, scope.description))
       case Left(err) => BadRequest(err)
     }
   }

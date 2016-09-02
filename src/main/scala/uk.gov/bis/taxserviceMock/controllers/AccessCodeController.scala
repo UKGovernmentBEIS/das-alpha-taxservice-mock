@@ -1,14 +1,14 @@
-package uk.gov.bis.taxserviceMock.controllers.gateway
+package uk.gov.bis.taxserviceMock.controllers
 
 import javax.inject.Inject
 
 import play.api.mvc.{Action, Controller}
-import uk.gov.bis.taxserviceMock.actions.gateway.GatewayUserAction
+import uk.gov.bis.taxserviceMock.actions.GatewayUserAction
 
 class AccessCodeController @Inject()(UserAction: GatewayUserAction) extends Controller {
 
   def show(continue: String, origin: Option[String]) = Action { implicit request =>
-    Ok(views.html.gateway.accesscode(continue, origin))
+    Ok(views.html.accesscode(continue, origin))
   }
 
   def handleAccessCode(continue: String, origin: Option[String]) = Action { implicit request =>

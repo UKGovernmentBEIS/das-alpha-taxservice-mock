@@ -5,13 +5,13 @@
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file            controllers.Assets.at(path="/public", file)
 
-GET         /gg/sign-in              uk.gov.bis.taxserviceMock.controllers.gateway.GatewaySignInController.show(continue: String, origin: Option[String])
-POST        /gg/sign-in              uk.gov.bis.taxserviceMock.controllers.gateway.GatewaySignInController.handleSignIn(continue: String, origin: Option[String])
+GET         /gg/sign-in              uk.gov.bis.taxserviceMock.controllers.GatewaySignInController.show(continue: String, origin: Option[String])
+POST        /gg/sign-in              uk.gov.bis.taxserviceMock.controllers.GatewaySignInController.handleSignIn(continue: String, origin: Option[String])
 
-GET         /gg/access-code          uk.gov.bis.taxserviceMock.controllers.gateway.AccessCodeController.show(continue: String, origin: Option[String])
-POST        /gg/access-code          uk.gov.bis.taxserviceMock.controllers.gateway.AccessCodeController.handleAccessCode(continue: String, origin: Option[String])
+GET         /gg/access-code          uk.gov.bis.taxserviceMock.controllers.AccessCodeController.show(continue: String, origin: Option[String])
+POST        /gg/access-code          uk.gov.bis.taxserviceMock.controllers.AccessCodeController.handleAccessCode(continue: String, origin: Option[String])
 
-GET         /oauth/grantscope        uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.show(auth_id: Long)
-POST        /oauth/grantscope        uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.grantScope(auth_id: Long)
-GET         /oauth/cancel            uk.gov.bis.taxserviceMock.controllers.gateway.GrantScopeController.cancel(auth_id: Long)
+GET         /oauth/grantscope        uk.gov.bis.taxserviceMock.controllers.GrantScopeController.show(auth_id: Long)
+POST        /oauth/grantscope        uk.gov.bis.taxserviceMock.controllers.GrantScopeController.grantScope(auth_id: Long)
+GET         /oauth/cancel            uk.gov.bis.taxserviceMock.controllers.GrantScopeController.cancel(auth_id: Long)
 
