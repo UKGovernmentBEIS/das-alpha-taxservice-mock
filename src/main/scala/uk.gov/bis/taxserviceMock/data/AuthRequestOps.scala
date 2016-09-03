@@ -2,7 +2,7 @@ package uk.gov.bis.taxserviceMock.data
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthRequest(scope: String, clientId: String, redirectUri: String, state: Option[String], id: Long= 0, creationDate: Long = System.currentTimeMillis())
+case class AuthRequest(scope: String, clientId: String, redirectUri: String, state: Option[String], id: Long= 0, creationDate: MongoDate = System.currentTimeMillis())
 
 trait AuthRequestOps {
   /**

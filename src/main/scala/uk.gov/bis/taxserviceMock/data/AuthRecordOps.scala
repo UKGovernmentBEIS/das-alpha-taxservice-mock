@@ -1,6 +1,22 @@
 package uk.gov.bis.taxserviceMock.data
 
+import play.api.libs.json.Json
+
 import scala.concurrent.{ExecutionContext, Future}
+
+case class MongoDate(`$numberLong`: String)
+
+object MongoDate {
+  import scala.language.implicitConversions
+
+  def apply(ts: Long): MongoDate = MongoDate(ts.toString)
+
+  implicit def fromLong(ts: Long): MongoDate = MongoDate(ts)
+
+  implicit def toLong(mongoDate: MongoDate): Long = mongoDate.`$numberLong`.toLong
+
+  implicit val fmt = Json.format[MongoDate]
+}
 
 case class AuthRecord(
                        accessToken: String,
@@ -8,7 +24,7 @@ case class AuthRecord(
                        gatewayID: String,
                        scope: Option[String],
                        expiresIn: Long,
-                       createdAt: Long,
+                       createdAt: MongoDate,
                        clientID: String)
 
 trait AuthRecordOps {
