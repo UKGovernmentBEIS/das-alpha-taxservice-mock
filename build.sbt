@@ -15,6 +15,10 @@ PlayKeys.devSettings := Seq("play.server.http.port" -> "9002")
 
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
+// need this because we've disabled the PlayLayoutPlugin. without it twirl templates won't get
+// re-compiled on change in dev mode
+PlayKeys.playMonitoredFiles ++= (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value
+
 libraryDependencies ++= Seq(
   ws,
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.17.0",
