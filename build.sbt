@@ -21,7 +21,6 @@ PlayKeys.playMonitoredFiles ++= (sourceDirectories in (Compile, TwirlKeys.compil
 
 libraryDependencies ++= Seq(
   ws,
-  "com.nulab-inc" %% "play2-oauth2-provider" % "1.0.0",
   "uk.gov.hmrc" %% "domain" % "3.5.0",
   "org.mindrot" % "jbcrypt" % "0.3m",
   "org.typelevel" %% "cats-core" % "0.8.1",
