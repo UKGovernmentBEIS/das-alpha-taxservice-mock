@@ -2,10 +2,8 @@ package uk.gov.bis.taxserviceMock.controllers
 
 import javax.inject.Inject
 
-import cats.data.Xor.{Left, Right}
-import cats.data.{Xor, XorT}
+import cats.data.EitherT
 import cats.instances.future._
-import cats.syntax.xor._
 import play.api.mvc.Controller
 import uk.gov.bis.taxserviceMock.actions.GatewayUserAction
 import uk.gov.bis.taxserviceMock.data.{AuthCodeOps, AuthCodeRow, AuthRequestOps, ScopeOps}
@@ -16,13 +14,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthRequestOps, authCodes: AuthCodeOps, scopes: ScopeOps)(implicit ec: ExecutionContext) extends Controller {
 
   implicit class ErrorSyntax[A](ao: Option[A]) {
-    def orError(err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
+    def orError(err: String): Either[String, A] = ao.fold[Either[String, A]](Left(err))(Right(_))
   }
 
   def show(authId: Long) = UserAction.async { implicit request =>
     val x = for {
-      a <- XorT(auths.get(authId).map(_.orError("unknown auth id")))
-      s <- XorT(scopes.byName(a.scope).map(_.orError("unknown scope")))
+      a <- EitherT(auths.get(authId).map(_.orError("unknown auth id")))
+      s <- EitherT(scopes.byName(a.scope).map(_.orError("unknown scope")))
     } yield (a, s)
 
     x.value.map {
