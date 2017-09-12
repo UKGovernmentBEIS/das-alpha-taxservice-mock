@@ -25,16 +25,17 @@ class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthR
       s <- XorT(scopes.byName(a.scope).map(_.orError("unknown scope")))
     } yield (a, s)
 
-    x.value.map {
-      case Right((auth, scope)) => Ok(views.html.grantscope(auth.id, request.user.name, scope.description))
-      case Left(err) => BadRequest(err)
+    x.value.flatMap {
+      case Right((auth, scope)) if scope.needsExplicitGrant.contains(true) => Future.successful(Ok(views.html.grantscope(auth.id, request.user.name, scope.description)))
+      case Right((auth, scope))                                            => grantScope(auth.id)(request)
+      case Left(err)                                                       => Future.successful(BadRequest(err))
     }
   }
 
   def cancel(authId: Long) = UserAction.async { implicit request =>
     auths.pop(authId).map(_.orError("unknown auth id")).map {
       case Right(auth) => Redirect(s"${auth.redirectUri}?error=access_denied&error_description=user+denied+the+authorization&error_code=USER_DENIED_AUTHORIZATION")
-      case Left(err) => BadRequest(err)
+      case Left(err)   => BadRequest(err)
     }
   }
 
@@ -46,14 +47,14 @@ class GrantScopeController @Inject()(UserAction: GatewayUserAction, auths: AuthR
     import uk.gov.bis.taxserviceMock.auth.generateToken
 
     auths.pop(authId).flatMap {
-      case None => Future.successful(BadRequest)
+      case None       => Future.successful(BadRequest)
       case Some(auth) =>
         val token = generateToken
         val authCode = AuthCodeRow(token, request.user.gatewayID, "", System.currentTimeMillis(), Some(auth.scope), Some(auth.clientId), 4 * 60 * 60)
         authCodes.insert(authCode).map { _ =>
           val uri = auth.state match {
             case Some(s) => s"${auth.redirectUri}?code=${authCode.authorizationCode}&state=${helper.urlEncode(s)}"
-            case None => s"${auth.redirectUri}?code=${authCode.authorizationCode}"
+            case None    => s"${auth.redirectUri}?code=${authCode.authorizationCode}"
           }
           Redirect(uri).removingFromSession(UserAction.validatedUserKey)
         }
