@@ -1,6 +1,6 @@
 @import uk.gov.bis.taxserviceMock.controllers._
 
-@(authId: Long, userName:String, scopeDescription:String)
+@(authId: Long, userName:String, scopeDescriptions:Seq[String])
 
 @proposition = {
     <div class="header-proposition">
@@ -24,7 +24,9 @@
             <h1>Authority to interact with HMRC on your behalf</h1>
             <p>The <strong>DAS Alpha Client Mock</strong> software application is requesting to do the following:</p>
             <ul>
-                <li class="bullets">@scopeDescription</li>
+                @scopeDescriptions.map { scopeDescription =>
+                    <li class="bullets">@scopeDescription</li>
+                }
             </ul>
             <p>It will be able to do the above for 10 hours from when you grant authority.</p>
             <form method="post" action="@routes.GrantScopeController.grantScope(authId)">
